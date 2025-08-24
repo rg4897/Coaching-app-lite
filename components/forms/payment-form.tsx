@@ -167,7 +167,7 @@ export function PaymentForm({ onSuccess, onCancel }: PaymentFormProps) {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               Select Student
-              <Button type="button" variant="outline" size="sm" onClick={() => setShowNewStudentForm(true)}>
+              <Button type="button" variant="default" size="sm" onClick={() => setShowNewStudentForm(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 New Student
               </Button>
@@ -389,12 +389,14 @@ export function PaymentForm({ onSuccess, onCancel }: PaymentFormProps) {
 
       {/* New Student Dialog */}
       <Dialog open={showNewStudentForm} onOpenChange={setShowNewStudentForm}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Add New Student</DialogTitle>
-          </DialogHeader>
-          <StudentForm onSuccess={handleNewStudentSuccess} onCancel={() => setShowNewStudentForm(false)} />
-        </DialogContent>
+        <div className="overflow-hidden">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Add New Student</DialogTitle>
+            </DialogHeader>
+            <StudentForm onSuccess={handleNewStudentSuccess} onCancel={() => setShowNewStudentForm(false)} />
+          </DialogContent>
+        </div>
       </Dialog>
     </>
   )

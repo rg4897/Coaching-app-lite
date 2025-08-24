@@ -38,7 +38,7 @@ export function ResponsiveLayout({ children }: ResponsiveLayoutProps) {
         }`}
       >
         <Header onMenuClick={toggleSidebar} />
-        <main className="flex-1 overflow-auto p-4 lg:p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-4 lg:p-6 customScrollbarWidth">{children}</main>
       </div>
     </div>
   )

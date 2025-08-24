@@ -21,9 +21,10 @@ import type { Student, FeeTemplate, StudentFeeLine } from "@/types"
 interface StudentFormProps {
   student?: Student
   onSuccess?: () => void
+  onCancel?: () => void
 }
 
-export function StudentForm({ student, onSuccess }: StudentFormProps) {
+export function StudentForm({ student, onSuccess, onCancel }: StudentFormProps) {
   const router = useRouter()
   const { feeTemplates, refreshData } = useLiveData()
 
@@ -42,7 +43,7 @@ export function StudentForm({ student, onSuccess }: StudentFormProps) {
     notes: student?.notes || "",
   })
 
-  const [selectedFeeTemplates, setSelectedFeeTemplates] = useState<string[]>(
+  const [selectedFeeTemplates, setSelectedFeeTemplates] = useState<any>(
     student?.assignedFees.map((fee) => fee.templateId).filter(Boolean) || [],
   )
 
@@ -53,8 +54,8 @@ export function StudentForm({ student, onSuccess }: StudentFormProps) {
   }
 
   const handleFeeTemplateToggle = (templateId: string) => {
-    setSelectedFeeTemplates((prev) =>
-      prev.includes(templateId) ? prev.filter((id) => id !== templateId) : [...prev, templateId],
+    setSelectedFeeTemplates((prev:any) =>
+      prev.includes(templateId) ? prev.filter((id:any) => id !== templateId) : [...prev, templateId],
     )
   }
 
@@ -283,7 +284,7 @@ export function StudentForm({ student, onSuccess }: StudentFormProps) {
                 <div className="mt-4">
                   <Label>Selected Fees:</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {selectedFeeTemplates.map((templateId) => {
+                    {selectedFeeTemplates.map((templateId:any) => {
                       const template = feeTemplates.find((t) => t.id === templateId)
                       return template ? (
                         <Badge key={templateId} variant="default" className="flex items-center gap-1">
@@ -301,7 +302,7 @@ export function StudentForm({ student, onSuccess }: StudentFormProps) {
       </Card>
 
       <div className="flex justify-end gap-4">
-        <Button type="button" variant="outline" onClick={() => router.back()}>
+        <Button type="button" variant="outline" onClick={() => onCancel ? onCancel() : router.back()}>
           Cancel
         </Button>
         <Button type="submit" disabled={isSubmitting}>

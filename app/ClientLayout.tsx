@@ -33,7 +33,7 @@ html {
           <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
           <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
             <Header onMenuClick={() => setSidebarOpen(true)} />
-            <main className="flex-1 overflow-auto p-4 lg:p-6">{children}</main>
+            <main className="flex-1 overflow-auto p-4 lg:p-6 customScrollbarWidth">{children}</main>
           </div>
         </div>
       </body>
