@@ -92,10 +92,16 @@ export default function StudentsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Students</h1>
-          <p className="text-muted-foreground">
-            Manage student records and enrollment
-          </p>
+          <p className="text-muted-foreground">Manage student records and enrollment</p>
         </div>
+        {activeTab !== "form" && (
+          <div className="flex gap-2">
+            <Button onClick={() => setActiveTab("form")} className="mt-4">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Student
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Tabs for list and form views */}
