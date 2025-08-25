@@ -6,6 +6,7 @@ import { storage } from "@/lib/storage"
 import { formatCurrency } from "@/utils/currency"
 import { calculateOutstanding } from "@/utils/calculations"
 import { generateInvoiceHTML, generatePDF, downloadHTML } from "@/utils/pdf-generator"
+import { generateInvoiceNumber, assignInvoiceNumbersToExistingStudents } from "@/utils/invoice-number"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -62,7 +63,7 @@ export default function InvoicesPage() {
     }
   }
 
-  const generateInvoiceNumber = (): string => {
+  const generateNewInvoiceNumber = (): string => {
     const currentSettings = storage.getSettings()
     const nextSeq = currentSettings.invoiceSeq || 1
     storage.setSettings({ ...currentSettings, invoiceSeq: nextSeq + 1 })
@@ -73,11 +74,14 @@ export default function InvoicesPage() {
   const handleGenerateInvoice = async (student: any, format: "pdf" | "html" = "pdf") => {
     setIsGenerating(true)
     try {
+      // Use stored invoice number or generate a new one if not exists
+      const invoiceNumber = student.invoiceNumber || generateNewInvoiceNumber()
+      
       const invoiceData = {
         student,
         payments,
         settings: settings!,
-        invoiceNumber: generateInvoiceNumber(),
+        invoiceNumber: invoiceNumber,
         invoiceDate: new Date().toISOString(),
       }
 
@@ -105,11 +109,14 @@ export default function InvoicesPage() {
       const studentsToProcess = students.filter((s) => selectedStudents.includes(s.id))
 
       for (const student of studentsToProcess) {
+        // Use stored invoice number or generate a new one if not exists
+        const invoiceNumber = student.invoiceNumber || generateNewInvoiceNumber()
+        
         const invoiceData = {
           student,
           payments,
           settings: settings!,
-          invoiceNumber: generateInvoiceNumber(),
+          invoiceNumber: invoiceNumber,
           invoiceDate: new Date().toISOString(),
         }
 
@@ -135,6 +142,11 @@ export default function InvoicesPage() {
     }
   }
 
+  const handleAssignInvoiceNumbers = () => {
+    assignInvoiceNumbersToExistingStudents()
+    refreshData()
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -143,6 +155,10 @@ export default function InvoicesPage() {
           <p className="text-muted-foreground">Generate and manage student invoices</p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={handleAssignInvoiceNumbers}>
+            <FileText className="mr-2 h-4 w-4" />
+            Assign Invoice Numbers
+          </Button>
           {selectedStudents.length > 0 && (
             <Button onClick={() => setShowBulkDialog(true)}>
               <Users className="mr-2 h-4 w-4" />
@@ -187,7 +203,9 @@ export default function InvoicesPage() {
             <div className="text-2xl font-bold">
               INV-{new Date().getFullYear()}-{(settings?.invoiceSeq || 1).toString().padStart(4, "0")}
             </div>
-            <p className="text-xs text-muted-foreground">Auto-generated</p>
+            <p className="text-xs text-muted-foreground">
+              {students.filter(s => !s.invoiceNumber).length} students need invoice numbers
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -266,6 +284,7 @@ export default function InvoicesPage() {
                   <TableHead className="w-12">Select</TableHead>
                   <TableHead>Student</TableHead>
                   <TableHead>Grade</TableHead>
+                  <TableHead>Invoice #</TableHead>
                   <TableHead>Total Fees</TableHead>
                   <TableHead>Paid</TableHead>
                   <TableHead>Outstanding</TableHead>
@@ -296,6 +315,11 @@ export default function InvoicesPage() {
                         </div>
                       </TableCell>
                       <TableCell>{student.grade}</TableCell>
+                      <TableCell>
+                        <span className="font-mono text-sm">
+                          {student.invoiceNumber || "Not assigned"}
+                        </span>
+                      </TableCell>
                       <TableCell>{formatCurrency(totalFees, settings?.currency)}</TableCell>
                       <TableCell>{formatCurrency(totalPaid, settings?.currency)}</TableCell>
                       <TableCell>
