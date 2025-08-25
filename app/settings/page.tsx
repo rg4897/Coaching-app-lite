@@ -1,19 +1,25 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useLiveData } from "@/hooks/use-live-data"
-import { storage } from "@/lib/storage"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Settings, Globe, Palette, School } from "lucide-react"
-import type { Settings as SettingsType } from "@/types"
+import { useState } from "react";
+import { useLiveData } from "@/hooks/use-live-data";
+import { storage } from "@/lib/storage";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Settings, Globe, Palette, School } from "lucide-react";
+import type { Settings as SettingsType } from "@/types";
 
 export default function SettingsPage() {
-  const { settings, refreshData } = useLiveData()
+  const { settings, refreshData } = useLiveData();
   const [formData, setFormData] = useState<SettingsType | any>(
     settings || {
       id: "default",
@@ -27,7 +33,14 @@ export default function SettingsPage() {
       invoicePrefix: "INV",
       invoiceNumberStart: 1000,
       paymentMethods: ["Cash", "Check", "Bank Transfer", "Online"],
-      feeCategories: ["Tuition", "Books", "Lab Fee", "Transport", "Exam Fee", "Other"],
+      feeCategories: [
+        "Tuition",
+        "Books",
+        "Lab Fee",
+        "Transport",
+        "Exam Fee",
+        "Other",
+      ],
       gradeOptions: [
         "K-1",
         "K-2",
@@ -44,61 +57,93 @@ export default function SettingsPage() {
         "11th",
         "12th",
       ],
-    },
-  )
-  const [isSaving, setIsSaving] = useState(false)
-  const [newPaymentMethod, setNewPaymentMethod] = useState("")
-  const [newFeeCategory, setNewFeeCategory] = useState("")
-  const [newGradeOption, setNewGradeOption] = useState("")
-
+    }
+  );
+  const [isSaving, setIsSaving] = useState(false);
+  const [newPaymentMethod, setNewPaymentMethod] = useState("");
+  const [newFeeCategory, setNewFeeCategory] = useState("");
+  const [newGradeOption, setNewGradeOption] = useState("");
 
   const handleInputChange = (field: keyof SettingsType | any, value: any) => {
-    setFormData((prev:any) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      handleInputChange("logo", reader.result as string); // Save as base64
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleAddPaymentMethod = () => {
-    if (newPaymentMethod.trim() && !formData.paymentMethods.includes(newPaymentMethod.trim())) {
-      handleInputChange("paymentMethods", [...formData.paymentMethods, newPaymentMethod.trim()])
-      setNewPaymentMethod("")
+    if (
+      newPaymentMethod.trim() &&
+      !formData.paymentMethods.includes(newPaymentMethod.trim())
+    ) {
+      handleInputChange("paymentMethods", [
+        ...formData.paymentMethods,
+        newPaymentMethod.trim(),
+      ]);
+      setNewPaymentMethod("");
     }
-  }
+  };
 
   const handleAddFeeCategory = () => {
-    if (newFeeCategory.trim() && !formData.feeCategories.includes(newFeeCategory.trim())) {
-      handleInputChange("feeCategories", [...formData.feeCategories, newFeeCategory.trim()])
-      setNewFeeCategory("")
+    if (
+      newFeeCategory.trim() &&
+      !formData.feeCategories.includes(newFeeCategory.trim())
+    ) {
+      handleInputChange("feeCategories", [
+        ...formData.feeCategories,
+        newFeeCategory.trim(),
+      ]);
+      setNewFeeCategory("");
     }
-  }
+  };
   const handleGradeOption = () => {
-    if (newGradeOption.trim() && !formData.gradeOptions.includes(newGradeOption.trim())) {
-      handleInputChange("gradeOptions", [...formData.gradeOptions, newGradeOption.trim()])
-      setNewGradeOption("")
+    if (
+      newGradeOption.trim() &&
+      !formData.gradeOptions.includes(newGradeOption.trim())
+    ) {
+      handleInputChange("gradeOptions", [
+        ...formData.gradeOptions,
+        newGradeOption.trim(),
+      ]);
+      setNewGradeOption("");
+    } else {
     }
-    else{
-      
-    }
-  }
+  };
 
   const handleSave = async () => {
-    setIsSaving(true)
+    setIsSaving(true);
     try {
-      storage.setSettings(formData)
-      refreshData()
+      storage.setSettings(formData);
+      refreshData();
     } catch (error) {
-      console.error("Error saving settings:", error)
+      console.error("Error saving settings:", error);
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground">Configure system preferences and options</p>
+          <p className="text-muted-foreground">
+            Configure system preferences and options
+          </p>
         </div>
-        <Button className="hover:cursor-pointer" onClick={handleSave} disabled={isSaving}>
+        <Button
+          className="hover:cursor-pointer"
+          onClick={handleSave}
+          disabled={isSaving}
+        >
           {isSaving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
@@ -129,12 +174,29 @@ export default function SettingsPage() {
               <CardTitle>School Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex flex-col items-start gap-2">
+                <Label>School Logo</Label>
+                {settings?.logo && (
+                  <img
+                    src={settings?.logo}
+                    alt="School Logo"
+                    className="h-20 w-20 object-contain border rounded"
+                  />
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                />
+              </div>
               <div>
                 <Label htmlFor="schoolName">School Name</Label>
                 <Input
                   id="schoolName"
                   value={formData.schoolName}
-                  onChange={(e) => handleInputChange("schoolName", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("schoolName", e.target.value)
+                  }
                 />
               </div>
               <div>
@@ -142,7 +204,9 @@ export default function SettingsPage() {
                 <Input
                   id="academicYear"
                   value={formData.academicYear}
-                  onChange={(e) => handleInputChange("academicYear", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("academicYear", e.target.value)
+                  }
                   placeholder="2024-2025"
                 />
               </div>
@@ -159,17 +223,26 @@ export default function SettingsPage() {
                 <Input
                   id="invoicePrefix"
                   value={formData.invoicePrefix}
-                  onChange={(e) => handleInputChange("invoicePrefix", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("invoicePrefix", e.target.value)
+                  }
                   placeholder="INV"
                 />
               </div>
               <div>
-                <Label htmlFor="invoiceNumberStart">Starting Invoice Number</Label>
+                <Label htmlFor="invoiceNumberStart">
+                  Starting Invoice Number
+                </Label>
                 <Input
                   id="invoiceNumberStart"
                   type="number"
                   value={formData.invoiceNumberStart}
-                  onChange={(e) => handleInputChange("invoiceNumberStart", Number.parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleInputChange(
+                      "invoiceNumberStart",
+                      Number.parseInt(e.target.value)
+                    )
+                  }
                 />
               </div>
             </CardContent>
@@ -184,7 +257,12 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="language">Language</Label>
-                <Select value={formData.language} onValueChange={(value) => handleInputChange("language", value)}>
+                <Select
+                  value={formData.language}
+                  onValueChange={(value) =>
+                    handleInputChange("language", value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -200,7 +278,12 @@ export default function SettingsPage() {
               </div>
               <div>
                 <Label htmlFor="currency">Currency</Label>
-                <Select value={formData.currency} onValueChange={(value) => handleInputChange("currency", value)}>
+                <Select
+                  value={formData.currency}
+                  onValueChange={(value) =>
+                    handleInputChange("currency", value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -217,7 +300,12 @@ export default function SettingsPage() {
               </div>
               <div>
                 <Label htmlFor="dateFormat">Date Format</Label>
-                <Select value={formData.dateFormat} onValueChange={(value) => handleInputChange("dateFormat", value)}>
+                <Select
+                  value={formData.dateFormat}
+                  onValueChange={(value) =>
+                    handleInputChange("dateFormat", value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -225,22 +313,37 @@ export default function SettingsPage() {
                     <SelectItem value="MM/dd/yyyy">MM/dd/yyyy (US)</SelectItem>
                     <SelectItem value="dd/MM/yyyy">dd/MM/yyyy (UK)</SelectItem>
                     <SelectItem value="yyyy-MM-dd">yyyy-MM-dd (ISO)</SelectItem>
-                    <SelectItem value="dd.MM.yyyy">dd.MM.yyyy (German)</SelectItem>
+                    <SelectItem value="dd.MM.yyyy">
+                      dd.MM.yyyy (German)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label htmlFor="timezone">Timezone</Label>
-                <Select value={formData.timezone} onValueChange={(value) => handleInputChange("timezone", value)}>
+                <Select
+                  value={formData.timezone}
+                  onValueChange={(value) =>
+                    handleInputChange("timezone", value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="UTC">UTC</SelectItem>
-                    <SelectItem value="America/New_York">Eastern Time</SelectItem>
-                    <SelectItem value="America/Chicago">Central Time</SelectItem>
-                    <SelectItem value="America/Denver">Mountain Time</SelectItem>
-                    <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
+                    <SelectItem value="America/New_York">
+                      Eastern Time
+                    </SelectItem>
+                    <SelectItem value="America/Chicago">
+                      Central Time
+                    </SelectItem>
+                    <SelectItem value="America/Denver">
+                      Mountain Time
+                    </SelectItem>
+                    <SelectItem value="America/Los_Angeles">
+                      Pacific Time
+                    </SelectItem>
                     <SelectItem value="Europe/London">London</SelectItem>
                     <SelectItem value="Europe/Paris">Paris</SelectItem>
                     <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
@@ -260,7 +363,10 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="theme">Theme</Label>
-                <Select value={formData.theme} onValueChange={(value) => handleInputChange("theme", value)}>
+                <Select
+                  value={formData.theme}
+                  onValueChange={(value) => handleInputChange("theme", value)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -286,22 +392,32 @@ export default function SettingsPage() {
                   placeholder="Enter new payment method"
                   value={newPaymentMethod}
                   onChange={(e) => setNewPaymentMethod(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleAddPaymentMethod()}
+                  onKeyPress={(e) =>
+                    e.key === "Enter" && handleAddPaymentMethod()
+                  }
                 />
-                <Button onClick={handleAddPaymentMethod} disabled={!newPaymentMethod.trim()}>
+                <Button
+                  onClick={handleAddPaymentMethod}
+                  disabled={!newPaymentMethod.trim()}
+                >
                   Add
                 </Button>
               </div>
               <div className="space-y-2">
-                {formData.paymentMethods.map((method:any, index:any) => (
-                  <div key={index} className="flex items-center justify-between p-2 border rounded">
+                {formData.paymentMethods.map((method: any, index: any) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 border rounded"
+                  >
                     <span>{method}</span>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        const newMethods = formData.paymentMethods.filter((_:any, i:any) => i !== index)
-                        handleInputChange("paymentMethods", newMethods)
+                        const newMethods = formData.paymentMethods.filter(
+                          (_: any, i: any) => i !== index
+                        );
+                        handleInputChange("paymentMethods", newMethods);
                       }}
                     >
                       Remove
@@ -322,22 +438,32 @@ export default function SettingsPage() {
                   placeholder="Enter new fee category"
                   value={newFeeCategory}
                   onChange={(e) => setNewFeeCategory(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleAddFeeCategory()}
+                  onKeyPress={(e) =>
+                    e.key === "Enter" && handleAddFeeCategory()
+                  }
                 />
-                <Button onClick={handleAddFeeCategory} disabled={!newFeeCategory.trim()}>
+                <Button
+                  onClick={handleAddFeeCategory}
+                  disabled={!newFeeCategory.trim()}
+                >
                   Add
                 </Button>
               </div>
               <div className="space-y-2">
-                {formData.feeCategories.map((category:any, index:any) => (
-                  <div key={index} className="flex items-center justify-between p-2 border rounded">
+                {formData.feeCategories.map((category: any, index: any) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 border rounded"
+                  >
                     <span>{category}</span>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        const newCategories = formData.feeCategories.filter((_:any, i:any) => i !== index)
-                        handleInputChange("feeCategories", newCategories)
+                        const newCategories = formData.feeCategories.filter(
+                          (_: any, i: any) => i !== index
+                        );
+                        handleInputChange("feeCategories", newCategories);
                       }}
                     >
                       Remove
@@ -360,20 +486,28 @@ export default function SettingsPage() {
                   onChange={(e) => setNewGradeOption(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleGradeOption()}
                 />
-                <Button onClick={handleGradeOption} disabled={!newGradeOption.trim()}>
+                <Button
+                  onClick={handleGradeOption}
+                  disabled={!newGradeOption.trim()}
+                >
                   Add
                 </Button>
               </div>
               <div className="space-y-2">
-                {formData.gradeOptions.map((category:any, index:any) => (
-                  <div key={index} className="flex items-center justify-between p-2 border rounded">
+                {formData.gradeOptions.map((category: any, index: any) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 border rounded"
+                  >
                     <span>{category}</span>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        const newCategories = formData.gradeOptions.filter((_:any, i:any) => i !== index)
-                        handleInputChange("gradeOptions", newCategories)
+                        const newCategories = formData.gradeOptions.filter(
+                          (_: any, i: any) => i !== index
+                        );
+                        handleInputChange("gradeOptions", newCategories);
                       }}
                     >
                       Remove
@@ -386,5 +520,5 @@ export default function SettingsPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
