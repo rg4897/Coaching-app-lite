@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useLiveData } from "@/hooks/use-live-data"
 import { storage } from "@/lib/storage"
 import { formatCurrency } from "@/utils/currency"
@@ -25,6 +25,19 @@ export default function InvoicesPage() {
   const [selectedStudents, setSelectedStudents] = useState<string[]>([])
   const [isGenerating, setIsGenerating] = useState(false)
   const [showBulkDialog, setShowBulkDialog] = useState(false)
+  const [hasAutoAssigned, setHasAutoAssigned] = useState(false)
+
+  // Auto-assign invoice numbers when component loads
+  useEffect(() => {
+    if (!hasAutoAssigned && students.length > 0) {
+      const studentsWithoutInvoiceNumbers = students.filter(student => !student.invoiceNumber)
+      if (studentsWithoutInvoiceNumbers.length > 0) {
+        assignInvoiceNumbersToExistingStudents()
+        refreshData()
+      }
+      setHasAutoAssigned(true)
+    }
+  }, [students, hasAutoAssigned, refreshData])
 
   // Get unique grades
   const grades = Array.from(new Set(students.map((s) => s.grade))).sort()
@@ -142,10 +155,7 @@ export default function InvoicesPage() {
     }
   }
 
-  const handleAssignInvoiceNumbers = () => {
-    assignInvoiceNumbersToExistingStudents()
-    refreshData()
-  }
+
 
   return (
     <div className="space-y-6">
@@ -155,10 +165,6 @@ export default function InvoicesPage() {
           <p className="text-muted-foreground">Generate and manage student invoices</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleAssignInvoiceNumbers}>
-            <FileText className="mr-2 h-4 w-4" />
-            Assign Invoice Numbers
-          </Button>
           {selectedStudents.length > 0 && (
             <Button onClick={() => setShowBulkDialog(true)}>
               <Users className="mr-2 h-4 w-4" />
@@ -204,7 +210,7 @@ export default function InvoicesPage() {
               INV-{new Date().getFullYear()}-{(settings?.invoiceSeq || 1).toString().padStart(4, "0")}
             </div>
             <p className="text-xs text-muted-foreground">
-              {students.filter(s => !s.invoiceNumber).length} students need invoice numbers
+              Auto-assigned on page load
             </p>
           </CardContent>
         </Card>
@@ -315,11 +321,11 @@ export default function InvoicesPage() {
                         </div>
                       </TableCell>
                       <TableCell>{student.grade}</TableCell>
-                      <TableCell>
-                        <span className="font-mono text-sm">
-                          {student.invoiceNumber || "Not assigned"}
-                        </span>
-                      </TableCell>
+                                             <TableCell>
+                         <span className="font-mono text-sm">
+                           {student.invoiceNumber || "Assigning..."}
+                         </span>
+                       </TableCell>
                       <TableCell>{formatCurrency(totalFees, settings?.currency)}</TableCell>
                       <TableCell>{formatCurrency(totalPaid, settings?.currency)}</TableCell>
                       <TableCell>
