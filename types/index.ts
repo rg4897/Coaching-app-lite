@@ -48,13 +48,22 @@ export interface Payment {
 }
 
 export interface Settings {
-  logo: string;
+  id?: string;
+  logo?: string;
   schoolName: string;
   schoolLogoDataUrl?: string;
   currency: string;
   academicYear?: string;
   invoiceSeq?: number;
   dateFormat?: string;
+  language?: string;
+  theme?: string;
+  timezone?: string;
+  invoicePrefix?: string;
+  invoiceNumberStart?: number;
+  paymentMethods?: string[];
+  feeCategories?: string[];
+  gradeOptions?: string[];
 }
 
 export interface AppMetadata {
