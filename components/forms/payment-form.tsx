@@ -390,7 +390,7 @@ export function PaymentForm({ onSuccess, onCancel }: PaymentFormProps) {
       {/* New Student Dialog */}
       <Dialog open={showNewStudentForm} onOpenChange={setShowNewStudentForm}>
         <div className="overflow-hidden">
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto customScrollbarWidth">
             <DialogHeader>
               <DialogTitle>Add New Student</DialogTitle>
             </DialogHeader>
