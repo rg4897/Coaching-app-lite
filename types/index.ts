@@ -13,6 +13,7 @@ export interface Student {
   status: "active" | "inactive";
   notes?: string;
   assignedFees: StudentFeeLine[]; // snapshot of assigned fee lines
+  invoiceNumber?: string; // generated invoice number
 }
 
 export interface FeeTemplate {

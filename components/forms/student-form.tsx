@@ -6,6 +6,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { storage } from "@/lib/storage"
 import { generateUUID } from "@/utils/uuid"
+import { generateInvoiceNumber } from "@/utils/invoice-number"
 import { useLiveData } from "@/hooks/use-live-data"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -91,10 +92,14 @@ export function StudentForm({ student, onSuccess, onCancel }: StudentFormProps) 
     try {
       const selectedTemplates = feeTemplates.filter((template) => selectedFeeTemplates.includes(template.id))
 
+      // Generate invoice number for new students or if student doesn't have one
+      const invoiceNumber = student?.invoiceNumber || generateInvoiceNumber()
+
       const studentData: Student = {
         id: student?.id || generateUUID(),
         ...formData,
         enrollmentDate: new Date(formData.enrollmentDate).toISOString(),
+        invoiceNumber: invoiceNumber,
         assignedFees: student
           ? [
               // Keep existing fees that aren't from templates being removed
