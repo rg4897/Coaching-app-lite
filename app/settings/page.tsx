@@ -392,7 +392,7 @@ export default function SettingsPage() {
                   placeholder="Enter new payment method"
                   value={newPaymentMethod}
                   onChange={(e) => setNewPaymentMethod(e.target.value)}
-                  onKeyPress={(e) =>
+                  onKeyUp={(e) =>
                     e.key === "Enter" && handleAddPaymentMethod()
                   }
                 />
@@ -438,7 +438,7 @@ export default function SettingsPage() {
                   placeholder="Enter new fee category"
                   value={newFeeCategory}
                   onChange={(e) => setNewFeeCategory(e.target.value)}
-                  onKeyPress={(e) =>
+                  onKeyUp={(e) =>
                     e.key === "Enter" && handleAddFeeCategory()
                   }
                 />
@@ -484,7 +484,7 @@ export default function SettingsPage() {
                   placeholder="Enter new fee category"
                   value={newGradeOption}
                   onChange={(e) => setNewGradeOption(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleGradeOption()}
+                  onKeyUp={(e) => e.key === "Enter" && handleGradeOption()}
                 />
                 <Button
                   onClick={handleGradeOption}
