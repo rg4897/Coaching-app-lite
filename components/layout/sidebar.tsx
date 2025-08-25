@@ -71,11 +71,10 @@ export function Sidebar({
             )}
             <div>
               <h2 className="text-lg font-semibold">
-                {settings?.schoolName || "Tuition Management System"}
+                {settings?.schoolName}
               </h2>
               <p className="text-sm text-muted-foreground">
-                Academic Year:{" "}
-                {settings?.academicYear || new Date().getFullYear()}
+                {`Academic Year:${settings?.academicYear || new Date().getFullYear()}`}
               </p>
             </div>
           </div>
