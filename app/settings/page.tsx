@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLiveData } from "@/hooks/use-live-data";
 import { storage } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
@@ -15,56 +15,100 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Globe, Palette, School } from "lucide-react";
-import type { Settings as SettingsType } from "@/types";
+import { Settings as SettingsIcon, Globe, Palette, School } from "lucide-react";
+import type { Settings } from "@/types";
 
 export default function SettingsPage() {
   const { settings, refreshData } = useLiveData();
-  const [formData, setFormData] = useState<SettingsType | any>(
-    settings || {
-      id: "default",
-      schoolName: "",
-      academicYear: new Date().getFullYear().toString(),
-      currency: "INR",
-      dateFormat: "MM/dd/yyyy",
-      language: "en",
-      theme: "light",
-      timezone: "UTC",
-      invoicePrefix: "INV",
-      invoiceNumberStart: 1000,
-      paymentMethods: ["Cash", "Check", "Bank Transfer", "Online"],
-      feeCategories: [
-        "Tuition",
-        "Books",
-        "Lab Fee",
-        "Transport",
-        "Exam Fee",
-        "Other",
-      ],
-      gradeOptions: [
-        "K-1",
-        "K-2",
-        "1st",
-        "2nd",
-        "3rd",
-        "4th",
-        "5th",
-        "6th",
-        "7th",
-        "8th",
-        "9th",
-        "10th",
-        "11th",
-        "12th",
-      ],
-    }
-  );
+  const [formData, setFormData] = useState<Settings | any>({
+    id: "default",
+    schoolName: "",
+    academicYear: new Date().getFullYear().toString(),
+    currency: "INR",
+    dateFormat: "MM/dd/yyyy",
+    language: "en",
+    theme: "light",
+    timezone: "UTC",
+    invoicePrefix: "INV",
+    invoiceNumberStart: 1000,
+    paymentMethods: ["Cash", "Check", "Bank Transfer", "Online"],
+    feeCategories: [
+      "Tuition",
+      "Books",
+      "Lab Fee",
+      "Transport",
+      "Exam Fee",
+      "Other",
+    ],
+    gradeOptions: [
+      "K-1",
+      "K-2",
+      "1st",
+      "2nd",
+      "3rd",
+      "4th",
+      "5th",
+      "6th",
+      "7th",
+      "8th",
+      "9th",
+      "10th",
+      "11th",
+      "12th",
+    ],
+  });
   const [isSaving, setIsSaving] = useState(false);
   const [newPaymentMethod, setNewPaymentMethod] = useState("");
   const [newFeeCategory, setNewFeeCategory] = useState("");
   const [newGradeOption, setNewGradeOption] = useState("");
+  const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleInputChange = (field: keyof SettingsType | any, value: any) => {
+  // Sync form data with settings from local storage
+  useEffect(() => {
+    if (settings) {
+      // Merge settings with defaults to ensure all fields are present
+      const defaults = {
+        id: "default",
+        schoolName: "",
+        academicYear: new Date().getFullYear().toString(),
+        currency: "INR",
+        dateFormat: "MM/dd/yyyy",
+        language: "en",
+        theme: "light",
+        timezone: "UTC",
+        invoicePrefix: "INV",
+        invoiceNumberStart: 1000,
+        paymentMethods: ["Cash", "Check", "Bank Transfer", "Online"],
+        feeCategories: [
+          "Tuition",
+          "Books",
+          "Lab Fee",
+          "Transport",
+          "Exam Fee",
+          "Other",
+        ],
+        gradeOptions: [
+          "K-1",
+          "K-2",
+          "1st",
+          "2nd",
+          "3rd",
+          "4th",
+          "5th",
+          "6th",
+          "7th",
+          "8th",
+          "9th",
+          "10th",
+          "11th",
+          "12th",
+        ],
+      };
+      setFormData({ ...defaults, ...settings });
+    }
+  }, [settings]);
+
+  const handleInputChange = (field: keyof Settings | any, value: any) => {
     setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
@@ -77,6 +121,30 @@ export default function SettingsPage() {
       handleInputChange("logo", reader.result as string); // Save as base64
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        handleInputChange("logo", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleAddPaymentMethod = () => {
@@ -163,7 +231,7 @@ export default function SettingsPage() {
             Appearance
           </TabsTrigger>
           <TabsTrigger value="system" className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
+            <SettingsIcon className="h-4 w-4" />
             System
           </TabsTrigger>
         </TabsList>
@@ -174,20 +242,83 @@ export default function SettingsPage() {
               <CardTitle>School Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex flex-col items-start gap-2">
+              <div className="flex flex-col items-start gap-4">
                 <Label>School Logo</Label>
-                {settings?.logo && (
-                  <img
-                    src={settings?.logo}
-                    alt="School Logo"
-                    className="h-20 w-20 object-contain border rounded"
-                  />
-                )}
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoUpload}
-                />
+                
+                {/* Logo Preview */}
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div 
+                      className={`h-24 w-24 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer ${
+                        isDragOver 
+                          ? 'border-blue-400 bg-blue-50 scale-105' 
+                          : formData.logo 
+                            ? 'border-gray-300 bg-gray-50 hover:bg-gray-100' 
+                            : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+                      }`}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => document.getElementById('logo-upload')?.click()}
+                    >
+                      {formData.logo ? (
+                        <img
+                          src={formData.logo}
+                          alt="School Logo"
+                          className="h-20 w-20 object-contain rounded"
+                        />
+                      ) : (
+                        <div className="text-center">
+                          <div className={`w-8 h-8 mx-auto mb-2 ${isDragOver ? 'text-blue-400' : 'text-gray-400'}`}>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <p className={`text-xs ${isDragOver ? 'text-blue-600' : 'text-gray-500'}`}>
+                            {isDragOver ? 'Drop here' : 'No logo'}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    {formData.logo && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleInputChange("logo", "");
+                        }}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Upload Button */}
+                  <div className="flex flex-col gap-2">
+                    <label
+                      htmlFor="logo-upload"
+                      className="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer transition-colors"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      {formData.logo ? 'Change Logo' : 'Upload Logo'}
+                    </label>
+                    <input
+                      id="logo-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Click to browse or drag & drop • Recommended: 200x200px, PNG or JPG
+                    </p>
+                  </div>
+                </div>
               </div>
               <div>
                 <Label htmlFor="schoolName">School Name</Label>
