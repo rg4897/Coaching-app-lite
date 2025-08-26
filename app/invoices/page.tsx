@@ -9,7 +9,7 @@ import { generateInvoiceHTML, generatePDF, downloadHTML } from "@/utils/pdf-gene
 import { generateInvoiceNumber, assignInvoiceNumbersToExistingStudents } from "@/utils/invoice-number"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import SelectWithLabel from "@/components/ui/select-with-label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -237,29 +237,32 @@ export default function InvoicesPage() {
                 />
               </div>
             </div>
-            <Select value={gradeFilter} onValueChange={setGradeFilter}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Grade" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Grades</SelectItem>
-                {grades.map((grade) => (
-                  <SelectItem key={grade} value={grade}>
-                    {grade}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={balanceFilter} onValueChange={setBalanceFilter}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Balance" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Students</SelectItem>
-                <SelectItem value="outstanding">With Outstanding</SelectItem>
-                <SelectItem value="paid">Fully Paid</SelectItem>
-              </SelectContent>
-            </Select>
+            {(() => {
+              const gradeData = [{ value: "all", label: "All Grades" }, ...grades.map(g => ({ value: g, label: g }))]
+              return (
+                <SelectWithLabel
+                  data={gradeData}
+                  selected={gradeFilter}
+                  onChange={setGradeFilter}
+                  placeholder="Grade"
+                />
+              )
+            })()}
+            {(() => {
+              const balanceData = [
+                { value: "all", label: "All Students" },
+                { value: "outstanding", label: "With Outstanding" },
+                { value: "paid", label: "Fully Paid" },
+              ]
+              return (
+                <SelectWithLabel
+                  data={balanceData}
+                  selected={balanceFilter}
+                  onChange={setBalanceFilter}
+                  placeholder="Balance"
+                />
+              )
+            })()}
           </div>
         </CardContent>
       </Card>
@@ -321,11 +324,11 @@ export default function InvoicesPage() {
                         </div>
                       </TableCell>
                       <TableCell>{student.grade}</TableCell>
-                                             <TableCell>
-                         <span className="font-mono text-sm">
-                           {student.invoiceNumber || "Assigning..."}
-                         </span>
-                       </TableCell>
+                      <TableCell>
+                        <span className="text-sm">
+                          {student.invoiceNumber || "Assigning..."}
+                        </span>
+                      </TableCell>
                       <TableCell>{formatCurrency(totalFees, settings?.currency)}</TableCell>
                       <TableCell>{formatCurrency(totalPaid, settings?.currency)}</TableCell>
                       <TableCell>
