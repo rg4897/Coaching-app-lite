@@ -6,7 +6,6 @@ import { storage } from "@/lib/storage"
 import { formatCurrency } from "@/utils/currency"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -15,8 +14,18 @@ import { Plus, Search, Filter, Edit, Trash2, Users } from "lucide-react"
 import { FeeTemplateForm } from "@/components/forms/fee-template-form"
 import { BulkAssignmentDialog } from "@/components/dialogs/bulk-assignment-dialog"
 import type { FeeTemplate } from "@/types"
+import SelectWithLabel from "@/components/ui/select-with-label"
 
 export default function FeesPage() {
+
+  const categoryData = [
+    { value: "all", label: "All Categories" },
+    { value: "tuition", label: "Tuition" },
+    { value: "exam", label: "Exam" },
+    { value: "transport", label: "Transport" },
+    { value: "misc", label: "Miscellaneous" },
+  ]
+
   const { feeTemplates, students, settings, refreshData } = useLiveData()
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
@@ -139,7 +148,9 @@ export default function FeesPage() {
                 />
               </div>
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            
+            <SelectWithLabel data={categoryData} selected={categoryFilter} onChange={setCategoryFilter} />
+            {/* <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -150,20 +161,25 @@ export default function FeesPage() {
                 <SelectItem value="transport">Transport</SelectItem>
                 <SelectItem value="misc">Miscellaneous</SelectItem>
               </SelectContent>
-            </Select>
-            <Select value={frequencyFilter} onValueChange={setFrequencyFilter}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Frequency" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Frequencies</SelectItem>
-                <SelectItem value="one-time">One-time</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="term">Term</SelectItem>
-                <SelectItem value="annual">Annual</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
-              </SelectContent>
-            </Select>
+            </Select> */}
+            {(() => {
+              const frequencyData = [
+                { value: "all", label: "All Frequencies" },
+                { value: "one-time", label: "One-time" },
+                { value: "monthly", label: "Monthly" },
+                { value: "term", label: "Term" },
+                { value: "annual", label: "Annual" },
+                { value: "custom", label: "Custom" },
+              ]
+              return (
+                <SelectWithLabel
+                  data={frequencyData}
+                  selected={frequencyFilter}
+                  onChange={setFrequencyFilter}
+                  placeholder="Frequency"
+                />
+              )
+            })()}
           </div>
         </CardContent>
       </Card>

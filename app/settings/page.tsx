@@ -6,13 +6,7 @@ import { storage } from "@/lib/storage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import SelectWithLabel from "@/components/ui/select-with-label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Settings as SettingsIcon, Globe, Palette, School } from "lucide-react";
@@ -386,102 +380,84 @@ export default function SettingsPage() {
               <CardTitle>Language & Region</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="language">Language</Label>
-                <Select
-                  value={formData.language}
-                  onValueChange={(value) =>
-                    handleInputChange("language", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                    <SelectItem value="de">German</SelectItem>
-                    <SelectItem value="zh">Chinese</SelectItem>
-                    <SelectItem value="ar">Arabic</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="currency">Currency</Label>
-                <Select
-                  value={formData.currency}
-                  onValueChange={(value) =>
-                    handleInputChange("currency", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USD">USD - US Dollar</SelectItem>
-                    <SelectItem value="EUR">EUR - Euro</SelectItem>
-                    <SelectItem value="GBP">GBP - British Pound</SelectItem>
-                    <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
-                    <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
-                    <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
-                    <SelectItem value="INR">INR - Indian Rupee</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="dateFormat">Date Format</Label>
-                <Select
-                  value={formData.dateFormat}
-                  onValueChange={(value) =>
-                    handleInputChange("dateFormat", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="MM/dd/yyyy">MM/dd/yyyy (US)</SelectItem>
-                    <SelectItem value="dd/MM/yyyy">dd/MM/yyyy (UK)</SelectItem>
-                    <SelectItem value="yyyy-MM-dd">yyyy-MM-dd (ISO)</SelectItem>
-                    <SelectItem value="dd.MM.yyyy">
-                      dd.MM.yyyy (German)
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="timezone">Timezone</Label>
-                <Select
-                  value={formData.timezone}
-                  onValueChange={(value) =>
-                    handleInputChange("timezone", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="UTC">UTC</SelectItem>
-                    <SelectItem value="America/New_York">
-                      Eastern Time
-                    </SelectItem>
-                    <SelectItem value="America/Chicago">
-                      Central Time
-                    </SelectItem>
-                    <SelectItem value="America/Denver">
-                      Mountain Time
-                    </SelectItem>
-                    <SelectItem value="America/Los_Angeles">
-                      Pacific Time
-                    </SelectItem>
-                    <SelectItem value="Europe/London">London</SelectItem>
-                    <SelectItem value="Europe/Paris">Paris</SelectItem>
-                    <SelectItem value="Asia/Tokyo">Tokyo</SelectItem>
-                    <SelectItem value="Asia/Shanghai">Shanghai</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {(() => {
+                const languageData = [
+                  { value: "en", label: "English" },
+                  { value: "es", label: "Spanish" },
+                  { value: "fr", label: "French" },
+                  { value: "de", label: "German" },
+                  { value: "zh", label: "Chinese" },
+                  { value: "ar", label: "Arabic" },
+                ]
+                return (
+                  <SelectWithLabel
+                    label="Language"
+                    data={languageData}
+                    selected={formData.language}
+                    onChange={(value: string) => handleInputChange("language", value)}
+                    placeholder="Select language"
+                  />
+                )
+              })()}
+              {(() => {
+                const currencyData = [
+                  { value: "USD", label: "USD - US Dollar" },
+                  { value: "EUR", label: "EUR - Euro" },
+                  { value: "GBP", label: "GBP - British Pound" },
+                  { value: "JPY", label: "JPY - Japanese Yen" },
+                  { value: "CAD", label: "CAD - Canadian Dollar" },
+                  { value: "AUD", label: "AUD - Australian Dollar" },
+                  { value: "INR", label: "INR - Indian Rupee" },
+                ]
+                return (
+                  <SelectWithLabel
+                    label="Currency"
+                    data={currencyData}
+                    selected={formData.currency}
+                    onChange={(value: string) => handleInputChange("currency", value)}
+                    placeholder="Select currency"
+                  />
+                )
+              })()}
+              {(() => {
+                const dateFormatData = [
+                  { value: "MM/dd/yyyy", label: "MM/dd/yyyy (US)" },
+                  { value: "dd/MM/yyyy", label: "dd/MM/yyyy (UK)" },
+                  { value: "yyyy-MM-dd", label: "yyyy-MM-dd (ISO)" },
+                  { value: "dd.MM.yyyy", label: "dd.MM.yyyy (German)" },
+                ]
+                return (
+                  <SelectWithLabel
+                    label="Date Format"
+                    data={dateFormatData}
+                    selected={formData.dateFormat}
+                    onChange={(value: string) => handleInputChange("dateFormat", value)}
+                    placeholder="Select date format"
+                  />
+                )
+              })()}
+              {(() => {
+                const timezoneData = [
+                  { value: "UTC", label: "UTC" },
+                  { value: "America/New_York", label: "Eastern Time" },
+                  { value: "America/Chicago", label: "Central Time" },
+                  { value: "America/Denver", label: "Mountain Time" },
+                  { value: "America/Los_Angeles", label: "Pacific Time" },
+                  { value: "Europe/London", label: "London" },
+                  { value: "Europe/Paris", label: "Paris" },
+                  { value: "Asia/Tokyo", label: "Tokyo" },
+                  { value: "Asia/Shanghai", label: "Shanghai" },
+                ]
+                return (
+                  <SelectWithLabel
+                    label="Timezone"
+                    data={timezoneData}
+                    selected={formData.timezone}
+                    onChange={(value: string) => handleInputChange("timezone", value)}
+                    placeholder="Select timezone"
+                  />
+                )
+              })()}
             </CardContent>
           </Card>
         </TabsContent>
@@ -492,22 +468,22 @@ export default function SettingsPage() {
               <CardTitle>Theme & Display</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="theme">Theme</Label>
-                <Select
-                  value={formData.theme}
-                  onValueChange={(value) => handleInputChange("theme", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="light">Light</SelectItem>
-                    <SelectItem value="dark">Dark</SelectItem>
-                    <SelectItem value="system">System</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              {(() => {
+                const themeData = [
+                  { value: "light", label: "Light" },
+                  { value: "dark", label: "Dark" },
+                  { value: "system", label: "System" },
+                ]
+                return (
+                  <SelectWithLabel
+                    label="Theme"
+                    data={themeData}
+                    selected={formData.theme}
+                    onChange={(value: string) => handleInputChange("theme", value)}
+                    placeholder="Select theme"
+                  />
+                )
+              })()}
             </CardContent>
           </Card>
         </TabsContent>

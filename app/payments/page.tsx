@@ -7,7 +7,7 @@ import { formatDate } from "@/utils/date"
 import { calculateOutstanding } from "@/utils/calculations"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import SelectWithLabel from "@/components/ui/select-with-label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -168,31 +168,34 @@ export default function PaymentsPage() {
                 />
               </div>
             </div>
-            <Select value={methodFilter} onValueChange={setMethodFilter}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Method" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Methods</SelectItem>
-                {paymentMethods.map((method) => (
-                  <SelectItem key={method} value={method}>
-                    {method}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={dateFilter} onValueChange={setDateFilter}>
-              <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="Date Range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Time</SelectItem>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="week">This Week</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-                <SelectItem value="year">This Year</SelectItem>
-              </SelectContent>
-            </Select>
+            {(() => {
+              const methodData = [{ value: "all", label: "All Methods" }, ...paymentMethods.map(m => ({ value: m, label: m }))]
+              return (
+                <SelectWithLabel
+                  data={methodData}
+                  selected={methodFilter}
+                  onChange={setMethodFilter}
+                  placeholder="Method"
+                />
+              )
+            })()}
+            {(() => {
+              const dateData = [
+                { value: "all", label: "All Time" },
+                { value: "today", label: "Today" },
+                { value: "week", label: "This Week" },
+                { value: "month", label: "This Month" },
+                { value: "year", label: "This Year" },
+              ]
+              return (
+                <SelectWithLabel
+                  data={dateData}
+                  selected={dateFilter}
+                  onChange={setDateFilter}
+                  placeholder="Date Range"
+                />
+              )
+            })()}
           </div>
         </CardContent>
       </Card>

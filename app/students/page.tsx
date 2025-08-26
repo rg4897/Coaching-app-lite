@@ -9,13 +9,7 @@ import { calculateOutstanding } from "@/utils/calculations";
 import { formatCurrency } from "@/utils/currency";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import SelectWithLabel from "@/components/ui/select-with-label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -173,29 +167,32 @@ export default function StudentsPage() {
                     />
                   </div>
                 </div>
-                <Select value={gradeFilter} onValueChange={setGradeFilter}>
-                  <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Grade" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Grades</SelectItem>
-                    {grades.map((grade) => (
-                      <SelectItem key={grade} value={grade}>
-                        {grade}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
+                {(() => {
+                  const gradeData = [{ value: "all", label: "All Grades" }, ...grades.map(g => ({ value: g, label: g }))]
+                  return (
+                    <SelectWithLabel
+                      data={gradeData}
+                      selected={gradeFilter}
+                      onChange={setGradeFilter}
+                      placeholder="Grade"
+                    />
+                  )
+                })()}
+                {(() => {
+                  const statusData = [
+                    { value: "all", label: "All Status" },
+                    { value: "active", label: "Active" },
+                    { value: "inactive", label: "Inactive" },
+                  ]
+                  return (
+                    <SelectWithLabel
+                      data={statusData}
+                      selected={statusFilter}
+                      onChange={setStatusFilter}
+                      placeholder="Status"
+                    />
+                  )
+                })()}
               </div>
             </CardContent>
           </Card>
