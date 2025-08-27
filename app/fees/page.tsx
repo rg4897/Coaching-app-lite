@@ -18,15 +18,20 @@ import SelectWithLabel from "@/components/ui/select-with-label"
 
 export default function FeesPage() {
 
+  const { feeTemplates, students, settings, refreshData } = useLiveData()
+  
   const categoryData = [
     { value: "all", label: "All Categories" },
-    { value: "tuition", label: "Tuition" },
-    { value: "exam", label: "Exam" },
-    { value: "transport", label: "Transport" },
-    { value: "misc", label: "Miscellaneous" },
+    ...(settings?.feeCategories?.map(category => ({ 
+      value: category.toLowerCase(), 
+      label: category 
+    })) || [
+      { value: "tuition", label: "Tuition" },
+      { value: "exam", label: "Exam" },
+      { value: "transport", label: "Transport" },
+      { value: "misc", label: "Miscellaneous" }
+    ])
   ]
-
-  const { feeTemplates, students, settings, refreshData } = useLiveData()
   const [searchTerm, setSearchTerm] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [frequencyFilter, setFrequencyFilter] = useState("all")
@@ -165,11 +170,16 @@ export default function FeesPage() {
             {(() => {
               const frequencyData = [
                 { value: "all", label: "All Frequencies" },
-                { value: "one-time", label: "One-time" },
-                { value: "monthly", label: "Monthly" },
-                { value: "term", label: "Term" },
-                { value: "annual", label: "Annual" },
-                { value: "custom", label: "Custom" },
+                ...(settings?.frequencyOptions?.map(frequency => ({ 
+                  value: frequency.toLowerCase(), 
+                  label: frequency 
+                })) || [
+                  { value: "one-time", label: "One-time" },
+                  { value: "monthly", label: "Monthly" },
+                  { value: "term", label: "Term" },
+                  { value: "annual", label: "Annual" },
+                  { value: "custom", label: "Custom" }
+                ])
               ]
               return (
                 <SelectWithLabel

@@ -27,7 +27,7 @@ interface StudentFormProps {
 
 export function StudentForm({ student, onSuccess, onCancel }: StudentFormProps) {
   const router = useRouter()
-  const { feeTemplates, refreshData } = useLiveData()
+  const { feeTemplates, settings, refreshData } = useLiveData()
 
   const [formData, setFormData] = useState({
     firstName: student?.firstName || "",
@@ -174,13 +174,33 @@ export function StudentForm({ student, onSuccess, onCancel }: StudentFormProps) 
             </div>
             <div>
               <Label htmlFor="grade">Grade *</Label>
-              <Input
-                id="grade"
-                value={formData.grade}
-                onChange={(e) => handleInputChange("grade", e.target.value)}
-                placeholder="e.g., 9th, 10th, K-1"
-                required
-              />
+              <Select value={formData.grade} onValueChange={(value) => handleInputChange("grade", value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select grade" />
+                </SelectTrigger>
+                <SelectContent>
+                  {settings?.gradeOptions?.map((grade) => (
+                    <SelectItem key={grade} value={grade}>
+                      {grade}
+                    </SelectItem>
+                  )) || [
+                    <SelectItem key="k-1" value="K-1">K-1</SelectItem>,
+                    <SelectItem key="k-2" value="K-2">K-2</SelectItem>,
+                    <SelectItem key="1st" value="1st">1st</SelectItem>,
+                    <SelectItem key="2nd" value="2nd">2nd</SelectItem>,
+                    <SelectItem key="3rd" value="3rd">3rd</SelectItem>,
+                    <SelectItem key="4th" value="4th">4th</SelectItem>,
+                    <SelectItem key="5th" value="5th">5th</SelectItem>,
+                    <SelectItem key="6th" value="6th">6th</SelectItem>,
+                    <SelectItem key="7th" value="7th">7th</SelectItem>,
+                    <SelectItem key="8th" value="8th">8th</SelectItem>,
+                    <SelectItem key="9th" value="9th">9th</SelectItem>,
+                    <SelectItem key="10th" value="10th">10th</SelectItem>,
+                    <SelectItem key="11th" value="11th">11th</SelectItem>,
+                    <SelectItem key="12th" value="12th">12th</SelectItem>
+                  ]}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

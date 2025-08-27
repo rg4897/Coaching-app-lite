@@ -34,6 +34,13 @@ export default function SettingsPage() {
       "Exam Fee",
       "Other",
     ],
+    frequencyOptions: [
+      "One-time",
+      "Monthly",
+      "Term",
+      "Annual",
+      "Custom",
+    ],
     gradeOptions: [
       "K-1",
       "K-2",
@@ -54,6 +61,7 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [newPaymentMethod, setNewPaymentMethod] = useState("");
   const [newFeeCategory, setNewFeeCategory] = useState("");
+  const [newFrequencyOption, setNewFrequencyOption] = useState("");
   const [newGradeOption, setNewGradeOption] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -80,6 +88,13 @@ export default function SettingsPage() {
           "Transport",
           "Exam Fee",
           "Other",
+        ],
+        frequencyOptions: [
+          "One-time",
+          "Monthly",
+          "Term",
+          "Annual",
+          "Custom",
         ],
         gradeOptions: [
           "K-1",
@@ -166,6 +181,20 @@ export default function SettingsPage() {
       setNewFeeCategory("");
     }
   };
+
+  const handleAddFrequencyOption = () => {
+    if (
+      newFrequencyOption.trim() &&
+      !formData.frequencyOptions.includes(newFrequencyOption.trim())
+    ) {
+      handleInputChange("frequencyOptions", [
+        ...formData.frequencyOptions,
+        newFrequencyOption.trim(),
+      ]);
+      setNewFrequencyOption("");
+    }
+  };
+
   const handleGradeOption = () => {
     if (
       newGradeOption.trim() &&
@@ -571,6 +600,52 @@ export default function SettingsPage() {
                           (_: any, i: any) => i !== index
                         );
                         handleInputChange("feeCategories", newCategories);
+                      }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Frequency Options</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter new frequency option"
+                  value={newFrequencyOption}
+                  onChange={(e) => setNewFrequencyOption(e.target.value)}
+                  onKeyUp={(e) =>
+                    e.key === "Enter" && handleAddFrequencyOption()
+                  }
+                />
+                <Button
+                  onClick={handleAddFrequencyOption}
+                  disabled={!newFrequencyOption.trim()}
+                >
+                  Add
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {formData.frequencyOptions.map((frequency: any, index: any) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-2 border rounded"
+                  >
+                    <span>{frequency}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        const newFrequencies = formData.frequencyOptions.filter(
+                          (_: any, i: any) => i !== index
+                        );
+                        handleInputChange("frequencyOptions", newFrequencies);
                       }}
                     >
                       Remove
