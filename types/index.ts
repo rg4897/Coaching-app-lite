@@ -63,6 +63,7 @@ export interface Settings {
   invoiceNumberStart?: number;
   paymentMethods?: string[];
   feeCategories?: string[];
+  frequencyOptions?: string[];
   gradeOptions?: string[];
 }
 

@@ -252,11 +252,17 @@ export function PaymentForm({ onSuccess, onCancel }: PaymentFormProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="card">Card</SelectItem>
-                    <SelectItem value="bank">Bank Transfer</SelectItem>
-                    <SelectItem value="check">Check</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    {settings?.paymentMethods?.map((method) => (
+                      <SelectItem key={method} value={method.toLowerCase()}>
+                        {method}
+                      </SelectItem>
+                    )) || [
+                      <SelectItem key="cash" value="cash">Cash</SelectItem>,
+                      <SelectItem key="card" value="card">Card</SelectItem>,
+                      <SelectItem key="bank" value="bank">Bank Transfer</SelectItem>,
+                      <SelectItem key="check" value="check">Check</SelectItem>,
+                      <SelectItem key="other" value="other">Other</SelectItem>
+                    ]}
                   </SelectContent>
                 </Select>
               </div>

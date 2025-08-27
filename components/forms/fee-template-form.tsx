@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { storage } from "@/lib/storage"
 import { generateUUID } from "@/utils/uuid"
+import { useLiveData } from "@/hooks/use-live-data"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -20,6 +21,7 @@ interface FeeTemplateFormProps {
 }
 
 export function FeeTemplateForm({ template, onSuccess, onCancel }: FeeTemplateFormProps) {
+  const { settings } = useLiveData()
   const [formData, setFormData] = useState({
     title: template?.title || "",
     category: template?.category || ("tuition" as const),
@@ -92,10 +94,16 @@ export function FeeTemplateForm({ template, onSuccess, onCancel }: FeeTemplateFo
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="tuition">Tuition</SelectItem>
-                  <SelectItem value="exam">Exam</SelectItem>
-                  <SelectItem value="transport">Transport</SelectItem>
-                  <SelectItem value="misc">Miscellaneous</SelectItem>
+                  {settings?.feeCategories?.map((category) => (
+                    <SelectItem key={category} value={category.toLowerCase()}>
+                      {category}
+                    </SelectItem>
+                  )) || [
+                    <SelectItem key="tuition" value="tuition">Tuition</SelectItem>,
+                    <SelectItem key="exam" value="exam">Exam</SelectItem>,
+                    <SelectItem key="transport" value="transport">Transport</SelectItem>,
+                    <SelectItem key="misc" value="misc">Miscellaneous</SelectItem>
+                  ]}
                 </SelectContent>
               </Select>
             </div>
@@ -123,11 +131,17 @@ export function FeeTemplateForm({ template, onSuccess, onCancel }: FeeTemplateFo
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="one-time">One-time</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="term">Term</SelectItem>
-                  <SelectItem value="annual">Annual</SelectItem>
-                  <SelectItem value="custom">Custom</SelectItem>
+                  {settings?.frequencyOptions?.map((frequency) => (
+                    <SelectItem key={frequency} value={frequency.toLowerCase()}>
+                      {frequency}
+                    </SelectItem>
+                  )) || [
+                    <SelectItem key="one-time" value="one-time">One-time</SelectItem>,
+                    <SelectItem key="monthly" value="monthly">Monthly</SelectItem>,
+                    <SelectItem key="term" value="term">Term</SelectItem>,
+                    <SelectItem key="annual" value="annual">Annual</SelectItem>,
+                    <SelectItem key="custom" value="custom">Custom</SelectItem>
+                  ]}
                 </SelectContent>
               </Select>
             </div>
