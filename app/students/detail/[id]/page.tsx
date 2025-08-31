@@ -1,33 +1,56 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { useLiveData } from "@/hooks/use-live-data"
-import { calculateOutstanding } from "@/utils/calculations"
-import { formatCurrency } from "@/utils/currency"
-import { formatDate } from "@/utils/date"
-import { StudentForm } from "@/components/forms/student-form"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Edit, ArrowLeft } from "lucide-react"
-import type { Student } from "@/types"
+import { useEffect, useMemo, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useLiveData } from "@/hooks/use-live-data";
+import { calculateOutstanding } from "@/utils/calculations";
+import { formatCurrency } from "@/utils/currency";
+import { formatDate } from "@/utils/date";
+import { StudentForm } from "@/components/forms/student-form";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Edit, ArrowLeft } from "lucide-react";
+import type { Student } from "@/types";
 
 export default function StudentDetailPage() {
-  const params = useParams()
-  const router = useRouter()
-  const { students, payments, settings, refreshData } = useLiveData()
-  const [student, setStudent] = useState<Student | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
+  const params = useParams();
+  const router = useRouter();
+  const { students, payments, settings, refreshData } = useLiveData();
+  const [student, setStudent] = useState<Student | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const studentId = params.id as string
+  const studentId = params?.id as string;
 
   useEffect(() => {
-    const foundStudent = students.find((s) => s.id === studentId)
-    setStudent(foundStudent || null)
-  }, [students, studentId])
+    const foundStudent = students.find((s) => s.id === studentId);
+    setStudent(foundStudent || null);
+  }, [students, studentId]);
+
+  if (!studentId) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={() => router.back()}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+        </div>
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">Missing student id</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!student) {
     return (
@@ -42,11 +65,11 @@ export default function StudentDetailPage() {
           <p className="text-muted-foreground">Student not found</p>
         </div>
       </div>
-    )
+    );
   }
 
-  const studentPayments = payments.filter((p) => p.studentId === student.id)
-  const outstanding = calculateOutstanding(student, payments)
+  const studentPayments = payments.filter((p) => p.studentId === student.id);
+  const outstanding = calculateOutstanding(student, payments);
 
   if (isEditing) {
     return (
@@ -59,17 +82,19 @@ export default function StudentDetailPage() {
         </div>
         <div>
           <h1 className="text-3xl font-bold">Edit Student</h1>
-          <p className="text-muted-foreground">Update student information and fee assignments</p>
+          <p className="text-muted-foreground">
+            Update student information and fee assignments
+          </p>
         </div>
         <StudentForm
           student={student}
           onSuccess={() => {
-            setIsEditing(false)
-            refreshData()
+            setIsEditing(false);
+            refreshData();
           }}
         />
       </div>
-    )
+    );
   }
 
   return (
@@ -111,11 +136,21 @@ export default function StudentDetailPage() {
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Status:</span>
-                  <Badge variant={student.status === "active" ? "default" : "secondary"}>{student.status}</Badge>
+                  <Badge
+                    variant={
+                      student.status === "active" ? "default" : "secondary"
+                    }
+                  >
+                    {student.status}
+                  </Badge>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Enrollment Date:</span>
-                  <span>{formatDate(student.enrollmentDate, settings?.dateFormat)}</span>
+                  <span className="text-muted-foreground">
+                    Enrollment Date:
+                  </span>
+                  <span>
+                    {formatDate(student.enrollmentDate, settings?.dateFormat)}
+                  </span>
                 </div>
                 {student.contactPhone && (
                   <div className="flex justify-between">
@@ -153,8 +188,11 @@ export default function StudentDetailPage() {
                   <span className="text-muted-foreground">Total Fees:</span>
                   <span className="font-medium">
                     {formatCurrency(
-                      student.assignedFees.reduce((sum, fee) => sum + fee.amount, 0),
-                      settings?.currency,
+                      student.assignedFees.reduce(
+                        (sum, fee) => sum + fee.amount,
+                        0
+                      ),
+                      settings?.currency
                     )}
                   </span>
                 </div>
@@ -162,14 +200,21 @@ export default function StudentDetailPage() {
                   <span className="text-muted-foreground">Total Paid:</span>
                   <span className="font-medium">
                     {formatCurrency(
-                      studentPayments.reduce((sum, payment) => sum + payment.amount, 0),
-                      settings?.currency,
+                      studentPayments.reduce(
+                        (sum, payment) => sum + payment.amount,
+                        0
+                      ),
+                      settings?.currency
                     )}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Outstanding:</span>
-                  <span className={`font-medium ${outstanding > 0 ? "text-destructive" : "text-green-600"}`}>
+                  <span
+                    className={`font-medium ${
+                      outstanding > 0 ? "text-destructive" : "text-green-600"
+                    }`}
+                  >
                     {formatCurrency(outstanding, settings?.currency)}
                   </span>
                 </div>
@@ -203,13 +248,22 @@ export default function StudentDetailPage() {
                   </TableHeader>
                   <TableBody>
                     {student.assignedFees.map((fee) => {
-                      const totalPaid = fee.paymentsApplied.reduce((sum, p) => sum + p.amount, 0)
+                      const totalPaid = fee.paymentsApplied.reduce(
+                        (sum, p) => sum + p.amount,
+                        0
+                      );
                       return (
                         <TableRow key={fee.id}>
-                          <TableCell className="font-medium">{fee.title}</TableCell>
-                          <TableCell>{formatCurrency(fee.amount, settings?.currency)}</TableCell>
+                          <TableCell className="font-medium">
+                            {fee.title}
+                          </TableCell>
                           <TableCell>
-                            {fee.dueDate ? formatDate(fee.dueDate, settings?.dateFormat) : "No due date"}
+                            {formatCurrency(fee.amount, settings?.currency)}
+                          </TableCell>
+                          <TableCell>
+                            {fee.dueDate
+                              ? formatDate(fee.dueDate, settings?.dateFormat)
+                              : "No due date"}
                           </TableCell>
                           <TableCell>
                             <Badge
@@ -217,18 +271,20 @@ export default function StudentDetailPage() {
                                 fee.status === "paid"
                                   ? "default"
                                   : fee.status === "partial"
-                                    ? "secondary"
-                                    : fee.status === "overdue"
-                                      ? "destructive"
-                                      : "outline"
+                                  ? "secondary"
+                                  : fee.status === "overdue"
+                                  ? "destructive"
+                                  : "outline"
                               }
                             >
                               {fee.status}
                             </Badge>
                           </TableCell>
-                          <TableCell>{formatCurrency(totalPaid, settings?.currency)}</TableCell>
+                          <TableCell>
+                            {formatCurrency(totalPaid, settings?.currency)}
+                          </TableCell>
                         </TableRow>
-                      )
+                      );
                     })}
                   </TableBody>
                 </Table>
@@ -258,10 +314,16 @@ export default function StudentDetailPage() {
                   </TableHeader>
                   <TableBody>
                     {studentPayments
-                      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                      .sort(
+                        (a, b) =>
+                          new Date(b.date).getTime() -
+                          new Date(a.date).getTime()
+                      )
                       .map((payment) => (
                         <TableRow key={payment.id}>
-                          <TableCell>{formatDate(payment.date, settings?.dateFormat)}</TableCell>
+                          <TableCell>
+                            {formatDate(payment.date, settings?.dateFormat)}
+                          </TableCell>
                           <TableCell className="font-medium">
                             {formatCurrency(payment.amount, settings?.currency)}
                           </TableCell>
@@ -270,16 +332,24 @@ export default function StudentDetailPage() {
                             {payment.appliedTo.length > 0 ? (
                               <div className="space-y-1">
                                 {payment.appliedTo.map((application, index) => {
-                                  const fee = student.assignedFees.find((f) => f.id === application.feeLineId)
+                                  const fee = student.assignedFees.find(
+                                    (f) => f.id === application.feeLineId
+                                  );
                                   return (
                                     <div key={index} className="text-sm">
-                                      {fee?.title}: {formatCurrency(application.amount, settings?.currency)}
+                                      {fee?.title}:{" "}
+                                      {formatCurrency(
+                                        application.amount,
+                                        settings?.currency
+                                      )}
                                     </div>
-                                  )
+                                  );
                                 })}
                               </div>
                             ) : (
-                              <span className="text-muted-foreground">Not applied</span>
+                              <span className="text-muted-foreground">
+                                Not applied
+                              </span>
                             )}
                           </TableCell>
                           <TableCell>{payment.notes || "-"}</TableCell>
@@ -293,5 +363,5 @@ export default function StudentDetailPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
