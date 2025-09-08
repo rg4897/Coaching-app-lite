@@ -1,4 +1,4 @@
-export function formatCurrency(amount: number, currency = "USD", abbreviated = false): string {
+export function formatCurrency(amount: number, currency = "INR", abbreviated = false): string {
   if (abbreviated && amount >= 1000) {
     const formatter = new Intl.NumberFormat("en-US", {
       style: "currency",

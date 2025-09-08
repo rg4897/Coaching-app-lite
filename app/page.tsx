@@ -6,10 +6,11 @@ import { formatCurrency } from "@/utils/currency"
 import { formatDate } from "@/utils/date"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Users, DollarSign, AlertCircle, TrendingUp, Calendar, Percent, Target } from "lucide-react"
+import { Users, ReceiptIndianRupee, AlertCircle, TrendingUp, Calendar, Percent, Target } from "lucide-react"
 import { CollectionTrendChart } from "@/components/charts/collection-trend-chart"
 import { FeeCategoryChart } from "@/components/charts/fee-category-chart"
 import { OutstandingByGradeChart } from "@/components/charts/outstanding-by-grade-chart"
+import { CollectionByGradeChart } from "@/components/charts/collection-by-grade-chart"
 
 export default function Dashboard() {
   const { students, payments, feeTemplates, settings } = useLiveData()
@@ -58,7 +59,7 @@ export default function Dashboard() {
   const averageFeePerStudent = totalStudents > 0 ? totalFees / totalStudents : 0
   const averagePaymentAmount = payments.length > 0 ? totalCollected / payments.length : 0
 
-  const currency = settings?.currency || "USD"
+  const currency = settings?.currency || "INR"
 
   return (
     <div className="space-y-6">
@@ -84,7 +85,7 @@ export default function Dashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Collected</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <ReceiptIndianRupee className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatCurrency(totalCollected, currency)}</div>
@@ -164,7 +165,10 @@ export default function Dashboard() {
         <FeeCategoryChart students={students} settings={settings!} />
       </div>
 
-      <OutstandingByGradeChart students={students} payments={payments} settings={settings!} />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <CollectionByGradeChart students={students} payments={payments} settings={settings!} />
+        <OutstandingByGradeChart students={students} payments={payments} settings={settings!} />
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>

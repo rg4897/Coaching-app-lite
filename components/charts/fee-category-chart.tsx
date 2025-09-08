@@ -22,7 +22,7 @@ const CATEGORY_COLORS = {
 }
 
 export function FeeCategoryChart({ students, settings }: FeeCategoryChartProps) {
-  const currency = settings?.currency || "USD"
+  const currency = settings?.currency || "INR"
 
   const chartData = useMemo(() => {
     const categoryTotals: Record<string, number> = {}

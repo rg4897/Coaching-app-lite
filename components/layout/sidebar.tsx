@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Users,
-  Receipt,
+  ReceiptIndianRupee,
   CreditCard,
   FileText,
   BarChart3,
@@ -19,7 +19,7 @@ import { useLiveData } from "@/hooks/use-live-data";
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Students", href: "/students", icon: Users },
-  { name: "Fee Templates", href: "/fees", icon: Receipt },
+  { name: "Fee Templates", href: "/fees", icon: ReceiptIndianRupee },
   { name: "Payments", href: "/payments", icon: CreditCard },
   { name: "Invoices", href: "/invoices", icon: FileText },
   { name: "Reports", href: "/reports", icon: BarChart3 },
