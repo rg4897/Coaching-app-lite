@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLiveData } from "@/hooks/use-live-data";
 import { calculateOutstanding } from "@/utils/calculations";
 import { formatCurrency } from "@/utils/currency";
@@ -10,26 +10,19 @@ import { StudentForm } from "@/components/forms/student-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Edit, ArrowLeft } from "lucide-react";
 import type { Student } from "@/types";
 
 export default function StudentDetailPage() {
-  const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { students, payments, settings, refreshData } = useLiveData();
   const [student, setStudent] = useState<Student | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const studentId = params?.id as string;
+  const studentId = useMemo(() => searchParams.get("id") || "", [searchParams]);
 
   useEffect(() => {
     const foundStudent = students.find((s) => s.id === studentId);
@@ -248,10 +241,7 @@ export default function StudentDetailPage() {
                   </TableHeader>
                   <TableBody>
                     {student.assignedFees.map((fee) => {
-                      const totalPaid = fee.paymentsApplied.reduce(
-                        (sum, p) => sum + p.amount,
-                        0
-                      );
+                      const totalPaid = fee.paymentsApplied.reduce((sum, p) => sum + p.amount, 0);
                       return (
                         <TableRow key={fee.id}>
                           <TableCell className="font-medium">
@@ -332,9 +322,7 @@ export default function StudentDetailPage() {
                             {payment.appliedTo.length > 0 ? (
                               <div className="space-y-1">
                                 {payment.appliedTo.map((application, index) => {
-                                  const fee = student.assignedFees.find(
-                                    (f) => f.id === application.feeLineId
-                                  );
+                                  const fee = student.assignedFees.find((f) => f.id === application.feeLineId);
                                   return (
                                     <div key={index} className="text-sm">
                                       {fee?.title}:{" "}
@@ -365,3 +353,5 @@ export default function StudentDetailPage() {
     </div>
   );
 }
+
+

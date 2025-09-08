@@ -309,7 +309,7 @@ export default function StudentsPage() {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Link
-                                href={`/students/detail/${student.id}`}
+                                href={`/students/detail?id=${student.id}`}
                                 passHref
                               >
                                 <Button variant="ghost" size="sm">
