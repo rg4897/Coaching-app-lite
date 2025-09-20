@@ -75,7 +75,9 @@ export default function StudentDetailPage() {
         </div>
         <div>
           <h1 className="text-3xl font-bold">Edit Student</h1>
-          <p className="text-muted-foreground">Update student information and fee assignments</p>
+          <p className="text-muted-foreground">
+            Update student information and fee assignments
+          </p>
         </div>
         <StudentForm
           student={student}
@@ -127,11 +129,21 @@ export default function StudentDetailPage() {
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Status:</span>
-                  <Badge variant={student.status === "active" ? "default" : "secondary"}>{student.status}</Badge>
+                  <Badge
+                    variant={
+                      student.status === "active" ? "default" : "secondary"
+                    }
+                  >
+                    {student.status}
+                  </Badge>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Enrollment Date:</span>
-                  <span>{formatDate(student.enrollmentDate, settings?.dateFormat)}</span>
+                  <span className="text-muted-foreground">
+                    Enrollment Date:
+                  </span>
+                  <span>
+                    {formatDate(student.enrollmentDate, settings?.dateFormat)}
+                  </span>
                 </div>
                 {student.contactPhone && (
                   <div className="flex justify-between">
@@ -169,8 +181,11 @@ export default function StudentDetailPage() {
                   <span className="text-muted-foreground">Total Fees:</span>
                   <span className="font-medium">
                     {formatCurrency(
-                      student.assignedFees.reduce((sum, fee) => sum + fee.amount, 0),
-                      settings?.currency,
+                      student.assignedFees.reduce(
+                        (sum, fee) => sum + fee.amount,
+                        0
+                      ),
+                      settings?.currency
                     )}
                   </span>
                 </div>
@@ -178,14 +193,21 @@ export default function StudentDetailPage() {
                   <span className="text-muted-foreground">Total Paid:</span>
                   <span className="font-medium">
                     {formatCurrency(
-                      studentPayments.reduce((sum, payment) => sum + payment.amount, 0),
-                      settings?.currency,
+                      studentPayments.reduce(
+                        (sum, payment) => sum + payment.amount,
+                        0
+                      ),
+                      settings?.currency
                     )}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Outstanding:</span>
-                  <span className={`font-medium ${outstanding > 0 ? "text-destructive" : "text-green-600"}`}>
+                  <span
+                    className={`font-medium ${
+                      outstanding > 0 ? "text-destructive" : "text-green-600"
+                    }`}
+                  >
                     {formatCurrency(outstanding, settings?.currency)}
                   </span>
                 </div>
@@ -222,10 +244,16 @@ export default function StudentDetailPage() {
                       const totalPaid = fee.paymentsApplied.reduce((sum, p) => sum + p.amount, 0);
                       return (
                         <TableRow key={fee.id}>
-                          <TableCell className="font-medium">{fee.title}</TableCell>
-                          <TableCell>{formatCurrency(fee.amount, settings?.currency)}</TableCell>
+                          <TableCell className="font-medium">
+                            {fee.title}
+                          </TableCell>
                           <TableCell>
-                            {fee.dueDate ? formatDate(fee.dueDate, settings?.dateFormat) : "No due date"}
+                            {formatCurrency(fee.amount, settings?.currency)}
+                          </TableCell>
+                          <TableCell>
+                            {fee.dueDate
+                              ? formatDate(fee.dueDate, settings?.dateFormat)
+                              : "No due date"}
                           </TableCell>
                           <TableCell>
                             <Badge
@@ -242,7 +270,9 @@ export default function StudentDetailPage() {
                               {fee.status}
                             </Badge>
                           </TableCell>
-                          <TableCell>{formatCurrency(totalPaid, settings?.currency)}</TableCell>
+                          <TableCell>
+                            {formatCurrency(totalPaid, settings?.currency)}
+                          </TableCell>
                         </TableRow>
                       );
                     })}
@@ -274,10 +304,16 @@ export default function StudentDetailPage() {
                   </TableHeader>
                   <TableBody>
                     {studentPayments
-                      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                      .sort(
+                        (a, b) =>
+                          new Date(b.date).getTime() -
+                          new Date(a.date).getTime()
+                      )
                       .map((payment) => (
                         <TableRow key={payment.id}>
-                          <TableCell>{formatDate(payment.date, settings?.dateFormat)}</TableCell>
+                          <TableCell>
+                            {formatDate(payment.date, settings?.dateFormat)}
+                          </TableCell>
                           <TableCell className="font-medium">
                             {formatCurrency(payment.amount, settings?.currency)}
                           </TableCell>
@@ -289,13 +325,19 @@ export default function StudentDetailPage() {
                                   const fee = student.assignedFees.find((f) => f.id === application.feeLineId);
                                   return (
                                     <div key={index} className="text-sm">
-                                      {fee?.title}: {formatCurrency(application.amount, settings?.currency)}
+                                      {fee?.title}:{" "}
+                                      {formatCurrency(
+                                        application.amount,
+                                        settings?.currency
+                                      )}
                                     </div>
                                   );
                                 })}
                               </div>
                             ) : (
-                              <span className="text-muted-foreground">Not applied</span>
+                              <span className="text-muted-foreground">
+                                Not applied
+                              </span>
                             )}
                           </TableCell>
                           <TableCell>{payment.notes || "-"}</TableCell>
