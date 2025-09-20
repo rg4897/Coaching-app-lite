@@ -29,12 +29,21 @@ import {
   Trash2,
   UserPlus,
   Users,
+  Download,
 } from "lucide-react";
 import type { Student } from "@/types";
 import { StudentForm } from "@/components/forms/student-form";
+import { downloadCSV, exportStudentsCSV } from "@/utils/csv-export";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function StudentsPage() {
-  const { students, payments, settings, refreshData } = useLiveData();
+  const { students, payments, feeTemplates, settings, refreshData } =
+    useLiveData();
   const [searchTerm, setSearchTerm] = useState("");
   const [gradeFilter, setGradeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -68,6 +77,19 @@ export default function StudentsPage() {
     }
   };
 
+  const handleDownloadStudents = () => {
+    const exportData = {
+      students,
+      payments,
+      feeTemplates,
+      settings: settings!,
+    };
+    const csvContent = exportStudentsCSV(exportData);
+    downloadCSV(
+      csvContent,
+      `students-${new Date().toISOString().split("T")[0]}.csv`
+    );
+  };
   const getPaymentStatus = (student: Student) => {
     const outstanding = calculateOutstanding(student, payments);
     if (outstanding === 0) return "paid";
@@ -86,11 +108,30 @@ export default function StudentsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Students</h1>
-          <p className="text-muted-foreground">Manage student records and enrollment</p>
+          <p className="text-muted-foreground">
+            Manage student records and enrollment
+          </p>
         </div>
         {activeTab !== "form" && (
-          <div className="flex gap-2">
-            <Button onClick={() => setActiveTab("form")} className="mt-4">
+          <div className="flex items-center gap-2">
+            {payments.length > 0 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDownloadStudents}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download CSV
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Download Students CSV</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            <Button size="sm" onClick={() => setActiveTab("form")}>
               <Plus className="mr-2 h-4 w-4" />
               Add Student
             </Button>
@@ -168,7 +209,10 @@ export default function StudentsPage() {
                   </div>
                 </div>
                 {(() => {
-                  const gradeData = [{ value: "all", label: "All Grades" }, ...grades.map(g => ({ value: g, label: g }))]
+                  const gradeData = [
+                    { value: "all", label: "All Grades" },
+                    ...grades.map((g) => ({ value: g, label: g })),
+                  ];
                   return (
                     <SelectWithLabel
                       data={gradeData}
@@ -176,14 +220,14 @@ export default function StudentsPage() {
                       onChange={setGradeFilter}
                       placeholder="Grade"
                     />
-                  )
+                  );
                 })()}
                 {(() => {
                   const statusData = [
                     { value: "all", label: "All Status" },
                     { value: "active", label: "Active" },
                     { value: "inactive", label: "Inactive" },
-                  ]
+                  ];
                   return (
                     <SelectWithLabel
                       data={statusData}
@@ -191,7 +235,7 @@ export default function StudentsPage() {
                       onChange={setStatusFilter}
                       placeholder="Status"
                     />
-                  )
+                  );
                 })()}
               </div>
             </CardContent>
@@ -289,7 +333,9 @@ export default function StudentsPage() {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Button variant="ghost" size="sm" asChild>
-                                <Link href={`/students/detail?id=${student.id}`}>
+                                <Link
+                                  href={`/students/detail?id=${student.id}`}
+                                >
                                   <Edit className="h-4 w-4" />
                                 </Link>
                               </Button>
