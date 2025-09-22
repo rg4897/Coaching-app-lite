@@ -1,135 +1,209 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useLiveData } from "@/hooks/use-live-data"
-import { storage } from "@/lib/storage"
-import { formatCurrency } from "@/utils/currency"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Plus, Search, Filter, Edit, Trash2, Users } from "lucide-react"
-import { FeeTemplateForm } from "@/components/forms/fee-template-form"
-import { BulkAssignmentDialog } from "@/components/dialogs/bulk-assignment-dialog"
-import type { FeeTemplate } from "@/types"
-import SelectWithLabel from "@/components/ui/select-with-label"
+import { useState } from "react";
+import { useLiveData } from "@/hooks/use-live-data";
+import { storage } from "@/lib/storage";
+import { formatCurrency } from "@/utils/currency";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Plus,
+  Search,
+  Filter,
+  Edit,
+  Trash2,
+  Users,
+  Download,
+} from "lucide-react";
+import { FeeTemplateForm } from "@/components/forms/fee-template-form";
+import { BulkAssignmentDialog } from "@/components/dialogs/bulk-assignment-dialog";
+import type { FeeTemplate } from "@/types";
+import SelectWithLabel from "@/components/ui/select-with-label";
+import { downloadCSV, exportFeeTemplatesCSV } from "@/utils/csv-export";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function FeesPage() {
+  const { feeTemplates, payments, students, settings, refreshData } =
+    useLiveData();
 
-  const { feeTemplates, students, settings, refreshData } = useLiveData()
-  
   const categoryData = [
     { value: "all", label: "All Categories" },
-    ...(settings?.feeCategories?.map(category => ({ 
-      value: category.toLowerCase(), 
-      label: category 
+    ...(settings?.feeCategories?.map((category) => ({
+      value: category.toLowerCase(),
+      label: category,
     })) || [
       { value: "tuition", label: "Tuition" },
       { value: "exam", label: "Exam" },
       { value: "transport", label: "Transport" },
-      { value: "misc", label: "Miscellaneous" }
-    ])
-  ]
-  const [searchTerm, setSearchTerm] = useState("")
-  const [categoryFilter, setCategoryFilter] = useState("all")
-  const [frequencyFilter, setFrequencyFilter] = useState("all")
-  const [editingTemplate, setEditingTemplate] = useState<FeeTemplate | null>(null)
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [bulkAssignTemplate, setBulkAssignTemplate] = useState<FeeTemplate | null>(null)
+      { value: "misc", label: "Miscellaneous" },
+    ]),
+  ];
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [frequencyFilter, setFrequencyFilter] = useState("all");
+  const [editingTemplate, setEditingTemplate] = useState<FeeTemplate | null>(
+    null
+  );
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [bulkAssignTemplate, setBulkAssignTemplate] =
+    useState<FeeTemplate | null>(null);
 
   // Filter templates
   const filteredTemplates = feeTemplates.filter((template) => {
-    const matchesSearch = template.title.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = categoryFilter === "all" || template.category === categoryFilter
-    const matchesFrequency = frequencyFilter === "all" || template.frequency === frequencyFilter
+    const matchesSearch = template.title
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      categoryFilter === "all" || template.category === categoryFilter;
+    const matchesFrequency =
+      frequencyFilter === "all" || template.frequency === frequencyFilter;
 
-    return matchesSearch && matchesCategory && matchesFrequency
-  })
+    return matchesSearch && matchesCategory && matchesFrequency;
+  });
+
+  const handleDownloadFeeTemplates = () => {
+    const exportData = {
+      students,
+      payments,
+      feeTemplates,
+      settings: settings!,
+    };
+    const csvContent = exportFeeTemplatesCSV(exportData);
+    downloadCSV(
+      csvContent,
+      `fee-templates-${new Date().toISOString().split("T")[0]}.csv`
+    );
+  };
 
   const handleDeleteTemplate = (templateId: string) => {
     const assignedStudents = students.filter((student) =>
-      student.assignedFees.some((fee) => fee.templateId === templateId),
-    )
+      student.assignedFees.some((fee) => fee.templateId === templateId)
+    );
 
     if (assignedStudents.length > 0) {
       if (
         !confirm(
           `This fee template is assigned to ${assignedStudents.length} student(s). ` +
-            `Deleting it will remove the fee from all assigned students. Continue?`,
+            `Deleting it will remove the fee from all assigned students. Continue?`
         )
       ) {
-        return
+        return;
       }
 
       // Remove fee lines from students
       assignedStudents.forEach((student) => {
-        const updatedFees = student.assignedFees.filter((fee) => fee.templateId !== templateId)
-        storage.updateStudent(student.id, { assignedFees: updatedFees })
-      })
+        const updatedFees = student.assignedFees.filter(
+          (fee) => fee.templateId !== templateId
+        );
+        storage.updateStudent(student.id, { assignedFees: updatedFees });
+      });
     }
 
-    storage.deleteFeeTemplate(templateId)
-    refreshData()
-  }
+    storage.deleteFeeTemplate(templateId);
+    refreshData();
+  };
 
   const handleEditTemplate = (template: FeeTemplate) => {
-    setEditingTemplate(template)
-    setIsFormOpen(true)
-  }
+    setEditingTemplate(template);
+    setIsFormOpen(true);
+  };
 
   const handleFormSuccess = () => {
-    setIsFormOpen(false)
-    setEditingTemplate(null)
-    refreshData()
-  }
+    setIsFormOpen(false);
+    setEditingTemplate(null);
+    refreshData();
+  };
 
   const getAssignedStudentCount = (templateId: string) => {
-    return students.filter((student) => student.assignedFees.some((fee) => fee.templateId === templateId)).length
-  }
+    return students.filter((student) =>
+      student.assignedFees.some((fee) => fee.templateId === templateId)
+    ).length;
+  };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "tuition":
-        return "default"
+        return "default";
       case "exam":
-        return "secondary"
+        return "secondary";
       case "transport":
-        return "outline"
+        return "outline";
       case "misc":
-        return "destructive"
+        return "destructive";
       default:
-        return "outline"
+        return "outline";
     }
-  }
+  };
 
   const getFrequencyColor = (frequency: string) => {
     switch (frequency) {
       case "one-time":
-        return "default"
+        return "default";
       case "monthly":
-        return "secondary"
+        return "secondary";
       case "term":
-        return "outline"
+        return "outline";
       case "annual":
-        return "destructive"
+        return "destructive";
       default:
-        return "outline"
+        return "outline";
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Fee Templates</h1>
-          <p className="text-muted-foreground">Manage fee templates and assign them to students</p>
+          <p className="text-muted-foreground">
+            Manage fee templates and assign them to students
+          </p>
         </div>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Fee Template
-        </Button>
+        <div className="flex gap-2">
+          {payments.length > 0 && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDownloadFeeTemplates}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download CSV
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Download payment CSV</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Fee Template
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -153,8 +227,12 @@ export default function FeesPage() {
                 />
               </div>
             </div>
-            
-            <SelectWithLabel data={categoryData} selected={categoryFilter} onChange={setCategoryFilter} />
+
+            <SelectWithLabel
+              data={categoryData}
+              selected={categoryFilter}
+              onChange={setCategoryFilter}
+            />
             {/* <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Category" />
@@ -170,17 +248,17 @@ export default function FeesPage() {
             {(() => {
               const frequencyData = [
                 { value: "all", label: "All Frequencies" },
-                ...(settings?.frequencyOptions?.map(frequency => ({ 
-                  value: frequency.toLowerCase(), 
-                  label: frequency 
+                ...(settings?.frequencyOptions?.map((frequency) => ({
+                  value: frequency.toLowerCase(),
+                  label: frequency,
                 })) || [
                   { value: "one-time", label: "One-time" },
                   { value: "monthly", label: "Monthly" },
                   { value: "term", label: "Term" },
                   { value: "annual", label: "Annual" },
-                  { value: "custom", label: "Custom" }
-                ])
-              ]
+                  { value: "custom", label: "Custom" },
+                ]),
+              ];
               return (
                 <SelectWithLabel
                   data={frequencyData}
@@ -188,7 +266,7 @@ export default function FeesPage() {
                   onChange={setFrequencyFilter}
                   placeholder="Frequency"
                 />
-              )
+              );
             })()}
           </div>
         </CardContent>
@@ -224,31 +302,45 @@ export default function FeesPage() {
               </TableHeader>
               <TableBody>
                 {filteredTemplates.map((template) => {
-                  const assignedCount = getAssignedStudentCount(template.id)
+                  const assignedCount = getAssignedStudentCount(template.id);
 
                   return (
                     <TableRow key={template.id}>
                       <TableCell>
                         <div>
                           <div className="font-medium">{template.title}</div>
-                          {template.notes && <div className="text-sm text-muted-foreground">{template.notes}</div>}
+                          {template.notes && (
+                            <div className="text-sm text-muted-foreground">
+                              {template.notes}
+                            </div>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getCategoryColor(template.category)}>{template.category}</Badge>
+                        <Badge variant={getCategoryColor(template.category)}>
+                          {template.category}
+                        </Badge>
                       </TableCell>
                       <TableCell className="font-medium">
                         {formatCurrency(template.amount, settings?.currency)}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getFrequencyColor(template.frequency)}>{template.frequency}</Badge>
+                        <Badge variant={getFrequencyColor(template.frequency)}>
+                          {template.frequency}
+                        </Badge>
                       </TableCell>
-                      <TableCell>{template.dueDay ? `Day ${template.dueDay}` : "Not set"}</TableCell>
+                      <TableCell>
+                        {template.dueDay ? `Day ${template.dueDay}` : "Not set"}
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <span>{assignedCount}</span>
                           {assignedCount > 0 && (
-                            <Button variant="ghost" size="sm" onClick={() => setBulkAssignTemplate(template)}>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setBulkAssignTemplate(template)}
+                            >
                               <Users className="h-4 w-4" />
                             </Button>
                           )}
@@ -256,19 +348,31 @@ export default function FeesPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="sm" onClick={() => setBulkAssignTemplate(template)}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setBulkAssignTemplate(template)}
+                          >
                             <Users className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" onClick={() => handleEditTemplate(template)}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditTemplate(template)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" onClick={() => handleDeleteTemplate(template.id)}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteTemplate(template.id)}
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>
                     </TableRow>
-                  )
+                  );
                 })}
               </TableBody>
             </Table>
@@ -280,14 +384,16 @@ export default function FeesPage() {
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editingTemplate ? "Edit Fee Template" : "Create Fee Template"}</DialogTitle>
+            <DialogTitle>
+              {editingTemplate ? "Edit Fee Template" : "Create Fee Template"}
+            </DialogTitle>
           </DialogHeader>
           <FeeTemplateForm
             template={editingTemplate}
             onSuccess={handleFormSuccess}
             onCancel={() => {
-              setIsFormOpen(false)
-              setEditingTemplate(null)
+              setIsFormOpen(false);
+              setEditingTemplate(null);
             }}
           />
         </DialogContent>
@@ -302,5 +408,5 @@ export default function FeesPage() {
         />
       )}
     </div>
-  )
+  );
 }
