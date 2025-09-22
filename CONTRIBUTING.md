@@ -25,7 +25,7 @@ Before starting any task, **you must create an issue** in the repository. This h
 
 1. **Go to the GitHub repository's Issues tab:**
 
-   * [https://github.com/<your-username>/<repo-name>/issues](https://github.com/<your-username>/<repo-name>/issues)
+   * [https://github.com/rg4897/Coaching-app-lite/issues](https://github.com/rg4897/Coaching-app-lite/issues)
 
 2. **Click on** `New Issue`.
 
@@ -34,14 +34,10 @@ Before starting any task, **you must create an issue** in the repository. This h
 4. **Fill in the following details** in the issue:
 
    * **Title**: Use a clear, concise title (e.g., `CAL-21: Implement Student Feedback Form`)
-   * **Description**: Provide a detailed explanation of the task. Include:
-
-     * Purpose of the task
-     * Acceptance criteria or deliverables
-     * Mockups or links (if available)
+   * **Description**: Provide a detailed explanation of the task. 
    * **Labels**: Assign the relevant labels (`feature`, `bug`, `enhancement`, etc.)
    * **Assignee**: Assign the issue to **yourself** or the person responsible for the task.
-   * **Project/Milestone**: Link to the appropriate project board or sprint milestone if used.
+   <!-- * **Project/Milestone**: Link to the appropriate project board or sprint milestone if used. -->
 
 5. **Submit the issue.**
 
