@@ -12,12 +12,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Plus } from "lucide-react"
+import { Plus, ChevronDownIcon, Check } from "lucide-react"
 import { StudentForm } from "@/components/forms/student-form"
 import type { Payment } from "@/types"
 
@@ -41,6 +43,7 @@ export function PaymentForm({ onSuccess, onCancel }: PaymentFormProps) {
   const [feeApplications, setFeeApplications] = useState<FeeApplication[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showNewStudentForm, setShowNewStudentForm] = useState(false)
+  const [isStudentPopoverOpen, setIsStudentPopoverOpen] = useState(false)
 
   const selectedStudent = students.find((s) => s.id === selectedStudentId)
   const outstanding = selectedStudent ? calculateOutstanding(selectedStudent, payments) : 0
@@ -174,33 +177,57 @@ export function PaymentForm({ onSuccess, onCancel }: PaymentFormProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Select value={selectedStudentId} onValueChange={setSelectedStudentId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Choose a student" />
-              </SelectTrigger>
-              <SelectContent>
-                {students
-                  .filter((s) => s.status === "active")
-                  .sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`))
-                  .map((student) => {
-                    const studentOutstanding = calculateOutstanding(student, payments)
-                    return (
-                      <SelectItem key={student.id} value={student.id}>
-                        <div className="flex items-center justify-between w-full">
-                          <span>
-                            {student.firstName} {student.lastName} ({student.grade})
-                          </span>
-                          {studentOutstanding > 0 && (
-                            <Badge variant="destructive" className="ml-2">
-                              {formatCurrency(studentOutstanding, settings?.currency)}
-                            </Badge>
-                          )}
-                        </div>
-                      </SelectItem>
-                    )
-                  })}
-              </SelectContent>
-            </Select>
+            <Popover open={isStudentPopoverOpen} onOpenChange={setIsStudentPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="justify-between"
+                  aria-label="Select Student"
+                >
+                  {selectedStudent ? `${selectedStudent.firstName} ${selectedStudent.lastName} (${selectedStudent.grade})` : "Choose a student"}
+                  <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput placeholder="Search students..." />
+                  <CommandList>
+                    <CommandEmpty>No student found.</CommandEmpty>
+                    <CommandGroup>
+                      {students
+                        .filter((s) => s.status === "active")
+                        .sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`))
+                        .map((student) => {
+                          const studentOutstanding = calculateOutstanding(student, payments)
+                          return (
+                            <CommandItem
+                              key={student.id}
+                              value={`${student.firstName} ${student.lastName} ${student.grade}`}
+                              onSelect={() => {
+                                setSelectedStudentId(student.id)
+                                setIsStudentPopoverOpen(false)
+                              }}
+                            >
+                              <Check className={`mr-2 h-4 w-4 ${selectedStudentId === student.id ? "opacity-100" : "opacity-0"}`} />
+                              <div className="flex items-center justify-between w-full">
+                                <span>
+                                  {student.firstName} {student.lastName} ({student.grade})
+                                </span>
+                                {studentOutstanding > 0 && (
+                                  <Badge variant="destructive" className="ml-2">
+                                    {formatCurrency(studentOutstanding, settings?.currency)}
+                                  </Badge>
+                                )}
+                              </div>
+                            </CommandItem>
+                          )
+                        })}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
 
             {selectedStudent && (
               <div className="mt-4 p-4 bg-muted rounded-lg">
