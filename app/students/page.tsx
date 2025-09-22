@@ -30,19 +30,21 @@ import {
   Trash2,
   UserPlus,
   Users,
+  Download,
 } from "lucide-react";
 import type { Student } from "@/types";
 import { StudentForm } from "@/components/forms/student-form";
+import { downloadCSV, exportStudentsCSV } from "@/utils/csv-export";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function StudentsPage() {
-  const { students, payments, settings, refreshData } = useLiveData();
+  const { students, payments, feeTemplates, settings, refreshData } =
+    useLiveData();
   const [searchTerm, setSearchTerm] = useState("");
   const [gradeFilter, setGradeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -83,6 +85,19 @@ export default function StudentsPage() {
     }
   };
 
+  const handleDownloadStudents = () => {
+    const exportData = {
+      students,
+      payments,
+      feeTemplates,
+      settings: settings!,
+    };
+    const csvContent = exportStudentsCSV(exportData);
+    downloadCSV(
+      csvContent,
+      `students-${new Date().toISOString().split("T")[0]}.csv`
+    );
+  };
   const getPaymentStatus = (student: Student) => {
     const outstanding = calculateOutstanding(student, payments);
     if (outstanding === 0) return "paid";
@@ -106,8 +121,25 @@ export default function StudentsPage() {
           </p>
         </div>
         {activeTab !== "form" && (
-          <div className="flex gap-2">
-            <Button onClick={() => setActiveTab("form")} className="mt-4">
+          <div className="flex items-center gap-2">
+            {payments.length > 0 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDownloadStudents}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download CSV
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Download Students CSV</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            <Button size="sm" onClick={() => setActiveTab("form")}>
               <Plus className="mr-2 h-4 w-4" />
               Add Student
             </Button>

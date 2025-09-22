@@ -152,10 +152,6 @@ export default function PaymentsPage() {
             Record and manage student payments
           </p>
         </div>
-        <Button onClick={() => setIsPaymentFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Payment
-        </Button>
       </div>
 
       {/* Summary Cards */}
