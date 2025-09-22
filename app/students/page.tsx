@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useLiveData } from "@/hooks/use-live-data";
 import { storage } from "@/lib/storage";
@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import SelectWithLabel from "@/components/ui/select-with-label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
 import {
   Table,
   TableBody,
@@ -32,6 +33,13 @@ import {
 } from "lucide-react";
 import type { Student } from "@/types";
 import { StudentForm } from "@/components/forms/student-form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function StudentsPage() {
   const { students, payments, settings, refreshData } = useLiveData();
@@ -39,7 +47,8 @@ export default function StudentsPage() {
   const [gradeFilter, setGradeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("list");
-
+  const [pageSize, setPageSize] = useState<number>(50);
+  const [page, setPage] = useState<number>(1);
   // Get unique grades for filter
   const grades = Array.from(new Set(students.map((s) => s.grade))).sort();
 
@@ -56,6 +65,12 @@ export default function StudentsPage() {
 
     return matchesSearch && matchesGrade && matchesStatus;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredStudents.length / pageSize));
+  const pagedStudents = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredStudents.slice(start, start + pageSize);
+  }, [filteredStudents, page, pageSize]);
 
   const handleDeleteStudent = (studentId: string) => {
     if (
@@ -86,7 +101,9 @@ export default function StudentsPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Students</h1>
-          <p className="text-muted-foreground">Manage student records and enrollment</p>
+          <p className="text-muted-foreground">
+            Manage student records and enrollment
+          </p>
         </div>
         {activeTab !== "form" && (
           <div className="flex gap-2">
@@ -168,7 +185,10 @@ export default function StudentsPage() {
                   </div>
                 </div>
                 {(() => {
-                  const gradeData = [{ value: "all", label: "All Grades" }, ...grades.map(g => ({ value: g, label: g }))]
+                  const gradeData = [
+                    { value: "all", label: "All Grades" },
+                    ...grades.map((g) => ({ value: g, label: g })),
+                  ];
                   return (
                     <SelectWithLabel
                       data={gradeData}
@@ -176,14 +196,14 @@ export default function StudentsPage() {
                       onChange={setGradeFilter}
                       placeholder="Grade"
                     />
-                  )
+                  );
                 })()}
                 {(() => {
                   const statusData = [
                     { value: "all", label: "All Status" },
                     { value: "active", label: "Active" },
                     { value: "inactive", label: "Inactive" },
-                  ]
+                  ];
                   return (
                     <SelectWithLabel
                       data={statusData}
@@ -191,7 +211,7 @@ export default function StudentsPage() {
                       onChange={setStatusFilter}
                       placeholder="Status"
                     />
-                  )
+                  );
                 })()}
               </div>
             </CardContent>
@@ -230,7 +250,7 @@ export default function StudentsPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredStudents.map((student) => {
+                    {pagedStudents.map((student) => {
                       const outstanding = calculateOutstanding(
                         student,
                         payments
@@ -288,11 +308,14 @@ export default function StudentsPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <Button variant="ghost" size="sm" asChild>
-                                <Link href={`/students/detail?id=${student.id}`}>
+                              <Link
+                                href={`/students/detail?id=${student.id}`}
+                                passHref
+                              >
+                                <Button variant="ghost" size="sm">
                                   <Edit className="h-4 w-4" />
-                                </Link>
-                              </Button>
+                                </Button>
+                              </Link>
                               <Button
                                 variant="ghost"
                                 size="sm"
@@ -311,6 +334,44 @@ export default function StudentsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+        <div>
+          <div className="flex items-center gap-2 justify-between">
+            <Select
+              value={String(pageSize)}
+              onValueChange={(v) => setPageSize(Number(v))}
+            >
+              <SelectTrigger className="w-[110px]">
+                <SelectValue placeholder="Page size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="25">25 / page</SelectItem>
+                <SelectItem value="50">50 / page</SelectItem>
+                <SelectItem value="100">100 / page</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >
+                Prev
+              </Button>
+              <span className="text-sm px-2">
+                Page {page} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        </div>
 
         <TabsContent value="form" className="space-y-6">
           <Card>
