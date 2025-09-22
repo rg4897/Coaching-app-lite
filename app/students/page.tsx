@@ -334,7 +334,7 @@ export default function StudentsPage() {
             </CardContent>
           </Card>
         </TabsContent>
-        <div>
+        {/* <div>
           <div className="flex items-center gap-2 justify-between">
             <Select
               value={String(pageSize)}
@@ -371,7 +371,7 @@ export default function StudentsPage() {
               </Button>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <TabsContent value="form" className="space-y-6">
           <Card>

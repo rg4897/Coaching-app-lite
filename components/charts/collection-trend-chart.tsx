@@ -5,7 +5,7 @@ import { formatCurrency } from "@/utils/currency"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from "recharts"
-import { TrendingUp, TrendingDown, DollarSign } from "lucide-react"
+import { TrendingUp, TrendingDown, IndianRupee } from "lucide-react"
 import type { Payment, Settings } from "@/types"
 
 interface CollectionTrendChartProps {
@@ -14,7 +14,7 @@ interface CollectionTrendChartProps {
 }
 
 export function CollectionTrendChart({ payments, settings }: CollectionTrendChartProps) {
-  const currency = settings?.currency || "USD"
+  const currency = settings?.currency || "INR"
 
   const chartData = useMemo(() => {
     const now = new Date()
@@ -57,7 +57,7 @@ export function CollectionTrendChart({ payments, settings }: CollectionTrendChar
         <div className="bg-background/95 backdrop-blur-sm border rounded-lg p-4 shadow-xl">
           <p className="font-semibold text-foreground">{label}</p>
           <div className="flex items-center gap-2 mt-2">
-            <DollarSign className="h-4 w-4 text-green-600" />
+            <IndianRupee className="h-4 w-4 text-green-600" />
             <span className="text-green-600 font-medium">{formatCurrency(payload[0].value, currency)}</span>
           </div>
           <p className="text-muted-foreground text-sm mt-1">

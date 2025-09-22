@@ -127,7 +127,7 @@ export class StorageService {
   getSettings(): Settings {
     return this.safeGet("settings", {
       schoolName: "My School",
-      currency: "USD",
+      currency: "INR",
       academicYear: new Date().getFullYear().toString(),
       invoiceSeq: 1,
       dateFormat: "MM/dd/yyyy",

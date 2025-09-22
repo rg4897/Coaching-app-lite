@@ -18,7 +18,7 @@ export function generateInvoiceHTML(data: InvoiceData): string {
   const outstanding = totalFees - totalPaid
 
   const formatCurrency = (amount: number) => {
-    const currency = settings?.currency || "USD"
+    const currency = settings?.currency || "INR"
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency,

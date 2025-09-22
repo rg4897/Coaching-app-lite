@@ -1,46 +1,44 @@
 "use client"
 
 import { useMemo } from "react"
-import { calculateOutstanding } from "@/utils/calculations"
 import { formatCurrency } from "@/utils/currency"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts"
-import { AlertTriangle, Users } from "lucide-react"
+import { ReceiptIndianRupee, Users } from "lucide-react"
 import type { Student, Payment, Settings } from "@/types"
 
-interface OutstandingByGradeChartProps {
+interface CollectionByGradeChartProps {
   students: Student[]
   payments: Payment[]
   settings: Settings
 }
 
-export function OutstandingByGradeChart({ students, payments, settings }: OutstandingByGradeChartProps) {
+export function CollectionByGradeChart({ students, payments, settings }: CollectionByGradeChartProps) {
   const currency = settings?.currency || "INR"
 
   const chartData = useMemo(() => {
-    const gradeData = new Map<string, { outstanding: number; count: number }>()
+    const gradeData = new Map<string, { collection: number; count: number }>()
 
-    students
-      .filter((student) => student.status === "active")
-      .forEach((student) => {
-        const outstanding = calculateOutstanding(student, payments)
-        if (outstanding > 0) {
-          const existing = gradeData.get(student.grade) || { outstanding: 0, count: 0 }
-          gradeData.set(student.grade, {
-            outstanding: existing.outstanding + outstanding,
-            count: existing.count + 1,
-          })
-        }
-      })
+    // Group payments by student grade
+    payments.forEach((payment) => {
+      const student = students.find((s) => s.id === payment.studentId)
+      if (student && student.status === "active") {
+        const existing = gradeData.get(student.grade) || { collection: 0, count: 0 }
+        gradeData.set(student.grade, {
+          collection: existing.collection + payment.amount,
+          count: existing.count + 1,
+        })
+      }
+    })
 
     return Array.from(gradeData.entries())
       .map(([grade, data]) => ({
         grade,
-        outstanding: data.outstanding,
+        collection: data.collection,
         count: data.count,
-        average: data.outstanding / data.count,
-        color: data.outstanding > 10000 ? "#ef4444" : data.outstanding > 5000 ? "#f59e0b" : "#10b981",
+        average: data.collection / data.count,
+        color: data.collection > 50000 ? "#10b981" : data.collection > 25000 ? "#3b82f6" : "#8b5cf6",
       }))
       .sort((a, b) => {
         const aNum = Number.parseInt(a.grade) || (a.grade === "K" ? 0 : 999)
@@ -49,11 +47,11 @@ export function OutstandingByGradeChart({ students, payments, settings }: Outsta
       })
   }, [students, payments])
 
-  const totalOutstanding = chartData.reduce((sum, item) => sum + item.outstanding, 0)
-  const totalStudents = chartData.reduce((sum, item) => sum + item.count, 0)
+  const totalCollection = chartData.reduce((sum, item) => sum + item.collection, 0)
+  const totalPayments = chartData.reduce((sum, item) => sum + item.count, 0)
   const highestGrade = chartData.reduce(
-    (max, item) => (item.outstanding > max.outstanding ? item : max),
-    chartData[0] || { outstanding: 0, grade: "N/A" },
+    (max, item) => (item.collection > max.collection ? item : max),
+    chartData[0] || { collection: 0, grade: "N/A" },
   )
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -62,15 +60,15 @@ export function OutstandingByGradeChart({ students, payments, settings }: Outsta
       return (
         <div className="bg-background/95 backdrop-blur-sm border rounded-lg p-4 shadow-xl">
           <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="h-4 w-4 text-orange-500" />
+            <ReceiptIndianRupee className="h-4 w-4 text-green-500" />
             <p className="font-semibold text-foreground">Grade {label}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-lg font-bold text-destructive">{formatCurrency(data.outstanding, currency)}</p>
+            <p className="text-lg font-bold text-green-600">{formatCurrency(data.collection, currency)}</p>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <Users className="h-3 w-3" />
               <span>
-                {data.count} student{data.count !== 1 ? "s" : ""}
+                {data.count} payment{data.count !== 1 ? "s" : ""}
               </span>
             </div>
             <p className="text-sm text-muted-foreground">Avg: {formatCurrency(data.average, currency)}</p>
@@ -86,19 +84,19 @@ export function OutstandingByGradeChart({ students, payments, settings }: Outsta
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <span>Outstanding Balances by Grade</span>
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-              All Clear
+            <span>Collection by Grade</span>
+            <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+              No Data
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center h-[320px] text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-              <Users className="h-8 w-8 text-green-600" />
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <ReceiptIndianRupee className="h-8 w-8 text-gray-600" />
             </div>
-            <p className="text-lg font-medium text-foreground">No Outstanding Balances!</p>
-            <p className="text-muted-foreground">All students have paid their fees</p>
+            <p className="text-lg font-medium text-foreground">No Collection Data!</p>
+            <p className="text-muted-foreground">No payments have been recorded yet</p>
           </div>
         </CardContent>
       </Card>
@@ -110,17 +108,17 @@ export function OutstandingByGradeChart({ students, payments, settings }: Outsta
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg flex items-center gap-2">
-            Outstanding by Grade
-            <AlertTriangle className="h-4 w-4 text-orange-500" />
+            Collection by Grade
+            <ReceiptIndianRupee className="h-4 w-4 text-green-500" />
           </CardTitle>
-          <Badge variant="destructive">
-            {totalStudents} student{totalStudents !== 1 ? "s" : ""}
+          <Badge variant="default" className="bg-green-100 text-green-700 border-green-200">
+            {totalPayments} payment{totalPayments !== 1 ? "s" : ""}
           </Badge>
         </div>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           <span>
-            Total outstanding:{" "}
-            <strong className="text-destructive">{formatCurrency(totalOutstanding, currency)}</strong>
+            Total collected:{" "}
+            <strong className="text-green-600">{formatCurrency(totalCollection, currency)}</strong>
           </span>
           <span>
             Highest: <strong className="text-foreground">Grade {highestGrade.grade}</strong>
@@ -131,9 +129,9 @@ export function OutstandingByGradeChart({ students, payments, settings }: Outsta
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
-              <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#ef4444" stopOpacity={0.4} />
+              <linearGradient id="collectionBarGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#10b981" stopOpacity={0.4} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted/30" />
@@ -152,7 +150,7 @@ export function OutstandingByGradeChart({ students, payments, settings }: Outsta
               tickLine={false}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="outstanding" radius={[6, 6, 0, 0]} stroke="hsl(var(--border))">
+            <Bar dataKey="collection" radius={[6, 6, 0, 0]} stroke="hsl(var(--border))">
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
