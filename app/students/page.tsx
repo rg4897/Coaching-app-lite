@@ -55,8 +55,19 @@ export default function StudentsPage() {
   const [activeTab, setActiveTab] = useState("list");
   const [pageSize, setPageSize] = useState<number>(50);
   const [page, setPage] = useState<number>(1);
+  const [paymentStatusFilter, setPaymentStatusFilter] = useState("all");
   // Get unique grades for filter
   const grades = Array.from(new Set(students.map((s) => s.grade))).sort();
+
+  
+  const getPaymentStatus = (student: Student) => {
+    const outstanding = calculateOutstanding(student, payments);
+    if (outstanding === 0) return "paid";
+    if (outstanding > 0 && payments.some((p) => p.studentId === student.id))
+      return "partial";
+    return "unpaid";
+  };
+
 
   // Filter students
   const filteredStudents = students.filter((student) => {
@@ -69,7 +80,11 @@ export default function StudentsPage() {
     const matchesStatus =
       statusFilter === "all" || student.status === statusFilter;
 
-    return matchesSearch && matchesGrade && matchesStatus;
+    const paymentStatus = getPaymentStatus(student);
+    const matchesPaymentStatus =
+      paymentStatusFilter === "all" || paymentStatus === paymentStatusFilter;
+
+    return matchesSearch && matchesGrade && matchesStatus && matchesPaymentStatus;
   });
 
   const totalPages = Math.max(1, Math.ceil(filteredStudents.length / pageSize));
@@ -101,13 +116,6 @@ export default function StudentsPage() {
       csvContent,
       `students-${new Date().toISOString().split("T")[0]}.csv`
     );
-  };
-  const getPaymentStatus = (student: Student) => {
-    const outstanding = calculateOutstanding(student, payments);
-    if (outstanding === 0) return "paid";
-    if (outstanding > 0 && payments.some((p) => p.studentId === student.id))
-      return "partial";
-    return "unpaid";
   };
 
   const handleStudentCreated = () => {
@@ -246,6 +254,22 @@ export default function StudentsPage() {
                       selected={statusFilter}
                       onChange={setStatusFilter}
                       placeholder="Status"
+                    />
+                  );
+                })()}
+                {(() => {
+                  const paymentStatusData = [
+                    { value: "all", label: "All Payment Status" },
+                    { value: "paid", label: "Paid" },
+                    { value: "partial", label: "Partial" },
+                    { value: "unpaid", label: "Unpaid" },
+                  ];
+                  return (
+                    <SelectWithLabel
+                      data={paymentStatusData}
+                      selected={paymentStatusFilter}
+                      onChange={setPaymentStatusFilter}
+                      placeholder="Payment Status"
                     />
                   );
                 })()}
