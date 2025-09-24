@@ -31,8 +31,14 @@ import {
   Users,
   Download,
 } from "lucide-react";
-import { FeeTemplateForm } from "@/components/forms/fee-template-form";
-import { BulkAssignmentDialog } from "@/components/dialogs/bulk-assignment-dialog";
+import dynamic from "next/dynamic";
+
+const FeeTemplateForm = dynamic(() => import("@/components/forms/fee-template-form"), {
+  loading: () => <div>Loading form...</div>,
+});
+const BulkAssignmentDialog = dynamic(() => import("@/components/dialogs/bulk-assignment-dialog"), {
+  loading: () => <div>Loading dialog...</div>,
+});
 import type { FeeTemplate } from "@/types";
 import SelectWithLabel from "@/components/ui/select-with-label";
 import { downloadCSV, exportFeeTemplatesCSV } from "@/utils/csv-export";

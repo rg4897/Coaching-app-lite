@@ -32,7 +32,11 @@ import {
   Calendar,
   CreditCard,
 } from "lucide-react";
-import { PaymentForm } from "@/components/forms/payment-form";
+import dynamic from "next/dynamic";
+
+const PaymentForm = dynamic(() => import("@/components/forms/payment-form"), {
+  loading: () => <div>Loading form...</div>,
+});
 import {
   Select,
   SelectContent,

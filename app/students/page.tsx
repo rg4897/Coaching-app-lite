@@ -33,7 +33,11 @@ import {
   Download,
 } from "lucide-react";
 import type { Student } from "@/types";
-import { StudentForm } from "@/components/forms/student-form";
+import dynamic from "next/dynamic";
+
+const StudentForm = dynamic(() => import("@/components/forms/student-form"), {
+  loading: () => <div>Loading form...</div>,
+});
 import { downloadCSV, exportStudentsCSV } from "@/utils/csv-export";
 import {
   Tooltip,
