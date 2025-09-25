@@ -6,7 +6,7 @@ import { formatCurrency } from "@/utils/currency"
 import { formatDate } from "@/utils/date"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Users, ReceiptIndianRupee, AlertCircle, TrendingUp, Calendar, Percent, Target, SquareArrowOutUpRight } from "lucide-react"
+import { Users, ReceiptIndianRupee, AlertCircle, TrendingUp, Calendar, Percent, Target, ChevronRight  } from "lucide-react"
 import { CollectionTrendChart } from "@/components/charts/collection-trend-chart"
 import { FeeCategoryChart } from "@/components/charts/fee-category-chart"
 import { OutstandingByGradeChart } from "@/components/charts/outstanding-by-grade-chart"
@@ -98,17 +98,18 @@ export default function Dashboard() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium">
               Total Students
+              <Users className="h-4 w-4 text-muted-foreground" />
             </CardTitle>
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-muted-foreground" />
               <Link
                 href="/students"
                 prefetch={false}
-                className="md:hidden lg:flex"
+                className="flex items-center gap-2 md:hidden lg:flex rounded-md transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               >
-                <SquareArrowOutUpRight
+                view more
+                <ChevronRight 
                   className="h-4 w-4 text-muted-foreground"
                   aria-label="Go to Students"
                 />
@@ -125,7 +126,7 @@ export default function Dashboard() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardHeader className="flex flex-row items-center space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Collected</CardTitle>
             <ReceiptIndianRupee className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -142,17 +143,20 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Outstanding</CardTitle>
-            <div className="flex items-center gap-2">
+            <CardTitle className=" flex items-center gap-2 text-sm font-medium">
+              Outstanding
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardTitle>
+             <div className="flex items-center gap-2">
               <Link
                 href="/invoices"
                 prefetch={false}
-                className="md:hidden lg:flex"
+                className="flex items-center gap-2 md:hidden lg:flex rounded-md transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               >
-                <SquareArrowOutUpRight
+                view more
+                <ChevronRight 
                   className="h-4 w-4 text-muted-foreground"
-                  aria-label="Go to Invoices"
+                  aria-label="Go to Students"
                 />
               </Link>
             </div>
@@ -169,15 +173,18 @@ export default function Dashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue</CardTitle>
-            <div className="flex items-center gap-2">
+            <CardTitle className=" flex items-center gap-2 text-sm font-medium">
+                Overdue
               <AlertCircle className="h-4 w-4 text-muted-foreground" />
+            </CardTitle>
+            <div className="flex items-center gap-2">
               <Link
                 href="/invoices"
                 prefetch={false}
-                className="md:hidden lg:flex"
+                className="flex items-center gap-2 md:hidden lg:flex rounded-md transition-colors text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               >
-                <SquareArrowOutUpRight
+                view more
+                <ChevronRight 
                   className="h-4 w-4 text-muted-foreground"
                   aria-label="Go to Invoices"
                 />
