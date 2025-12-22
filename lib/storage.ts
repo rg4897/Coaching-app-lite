@@ -4,10 +4,21 @@ import type {
   Payment,
   Settings,
   AppMetadata,
+  User,
 } from "@/types";
 
 const STORAGE_PREFIX = "tfm:v0:";
 const CURRENT_VERSION = "1.0.0";
+
+// Default admin user
+const DEFAULT_ADMIN: User = {
+  id: "admin-user-id",
+  username: "admin",
+  password: "admin123", // In a real app, this should be hashed
+  name: "Administrator",
+  role: "admin",
+  email: "admin@school.com",
+};
 
 export class StorageService {
   private static instance: StorageService;
@@ -150,6 +161,39 @@ export class StorageService {
     this.safeSet("metadata", metadata);
   }
 
+  // Users
+  getUsers(): User[] {
+    const users = this.safeGet<User[]>("users", []);
+    if (users.length === 0) {
+      // Initialize with default admin if no users exist
+      return [DEFAULT_ADMIN];
+    }
+    return users;
+  }
+
+  setUsers(users: User[]): void {
+    this.safeSet("users", users);
+  }
+
+  addUser(user: User): void {
+    const users = this.getUsers();
+    users.push(user);
+    this.setUsers(users);
+  }
+
+  deleteUser(id: string): void {
+    // Prevent deleting the last admin
+    const users = this.getUsers();
+    const userToDelete = users.find((u) => u.id === id);
+
+    if (userToDelete?.username === "admin") {
+      throw new Error("Cannot delete the default admin user");
+    }
+
+    const newUsers = users.filter((u) => u.id !== id);
+    this.setUsers(newUsers);
+  }
+
   // Backup & Restore
   exportData(): string {
     const data = {
@@ -158,6 +202,7 @@ export class StorageService {
       payments: this.getPayments(),
       settings: this.getSettings(),
       metadata: this.getMetadata(),
+      users: this.getUsers(),
       exportedAt: new Date().toISOString(),
     };
     return JSON.stringify(data, null, 2);
@@ -177,6 +222,9 @@ export class StorageService {
       this.setPayments(data.payments || []);
       this.setSettings(data.settings || this.getSettings());
       this.setMetadata(data.metadata || this.getMetadata());
+      if (data.users && Array.isArray(data.users)) {
+        this.setUsers(data.users);
+      }
 
       return true;
     } catch (error) {
@@ -193,6 +241,7 @@ export class StorageService {
       "payments",
       "settings",
       "metadata",
+      "users",
     ];
     keys.forEach((key) => {
       localStorage.removeItem(this.getKey(key));

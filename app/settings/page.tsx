@@ -7,10 +7,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import SelectWithLabel from "@/components/ui/select-with-label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings as SettingsIcon, Globe, Palette, School } from "lucide-react";
-import type { Settings } from "@/types";
+import { Settings as SettingsIcon, Globe, Palette, School, Users, Trash2, Plus } from "lucide-react";
+import type { Settings, User } from "@/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function SettingsPage() {
   const { settings, refreshData } = useLiveData();
@@ -64,6 +73,54 @@ export default function SettingsPage() {
   const [newFrequencyOption, setNewFrequencyOption] = useState("");
   const [newGradeOption, setNewGradeOption] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
+
+  // User Management State
+  const [users, setUsers] = useState<User[]>([]);
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [newUser, setNewUser] = useState<Partial<User>>({
+    username: "",
+    password: "",
+    name: "",
+    role: "user",
+    email: "",
+  });
+
+  useEffect(() => {
+    setUsers(storage.getUsers());
+  }, []);
+
+  const handleAddUser = () => {
+    if (!newUser.username || !newUser.password || !newUser.name) return;
+
+    const user: User = {
+      id: crypto.randomUUID(),
+      username: newUser.username,
+      password: newUser.password,
+      name: newUser.name,
+      role: newUser.role as "admin" | "user",
+      email: newUser.email,
+    };
+
+    storage.addUser(user);
+    setUsers(storage.getUsers());
+    setIsAddUserOpen(false);
+    setNewUser({
+      username: "",
+      password: "",
+      name: "",
+      role: "user",
+      email: "",
+    });
+  };
+
+  const handleDeleteUser = (id: string) => {
+    try {
+      storage.deleteUser(id);
+      setUsers(storage.getUsers());
+    } catch (error) {
+      alert("Cannot delete the default admin user");
+    }
+  };
 
   // Sync form data with settings from local storage
   useEffect(() => {
@@ -145,7 +202,7 @@ export default function SettingsPage() {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
@@ -240,7 +297,7 @@ export default function SettingsPage() {
       </div>
 
       <Tabs defaultValue="general" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="general" className="flex items-center gap-2">
             <School className="h-4 w-4" />
             General
@@ -257,6 +314,10 @@ export default function SettingsPage() {
             <SettingsIcon className="h-4 w-4" />
             System
           </TabsTrigger>
+          <TabsTrigger value="users" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Users
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-6">
@@ -267,18 +328,17 @@ export default function SettingsPage() {
             <CardContent className="space-y-4">
               <div className="flex flex-col items-start gap-4">
                 <Label>School Logo</Label>
-                
+
                 {/* Logo Preview */}
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <div 
-                      className={`h-24 w-24 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer ${
-                        isDragOver 
-                          ? 'border-blue-400 bg-blue-50 scale-105' 
-                          : formData.logo 
-                            ? 'border-gray-300 bg-gray-50 hover:bg-gray-100' 
-                            : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
-                      }`}
+                    <div
+                      className={`h-24 w-24 border-2 border-dashed rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer ${isDragOver
+                        ? 'border-blue-400 bg-blue-50 scale-105'
+                        : formData.logo
+                          ? 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+                          : 'border-gray-300 bg-gray-50 hover:bg-gray-100'
+                        }`}
                       onDragOver={handleDragOver}
                       onDragLeave={handleDragLeave}
                       onDrop={handleDrop}
@@ -318,7 +378,7 @@ export default function SettingsPage() {
                       </button>
                     )}
                   </div>
-                  
+
                   {/* Upload Button */}
                   <div className="flex flex-col gap-2">
                     <label
@@ -700,7 +760,124 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="users" className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>Manage system users and access roles</CardDescription>
+              </div>
+              <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add User
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New User</DialogTitle>
+                    <DialogDescription>
+                      Create a new user account for the system.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input
+                        id="name"
+                        value={newUser.name}
+                        onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                        placeholder="John Doe"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="username">Username</Label>
+                      <Input
+                        id="username"
+                        value={newUser.username}
+                        onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                        placeholder="johndoe"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email (Optional)</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={newUser.email}
+                        onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                        placeholder="john@example.com"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        value={newUser.password}
+                        onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                        placeholder="••••••••"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="role">Role</Label>
+                      <SelectWithLabel
+                        label="Role"
+                        data={[
+                          { value: "user", label: "User" },
+                          { value: "admin", label: "Admin" },
+                        ]}
+                        selected={newUser.role}
+                        onChange={(value: string) => setNewUser({ ...newUser, role: value as "user" | "admin" })}
+                        placeholder="Select role"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button onClick={handleAddUser}>Create User</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {users.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-medium">{user.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          @{user.username} • {user.role}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => handleDeleteUser(user.id)}
+                      disabled={user.username === "admin"}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
-    </div>
+    </div >
   );
 }

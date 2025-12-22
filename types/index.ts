@@ -1,5 +1,14 @@
 export type UUID = string;
 
+export interface User {
+  id: UUID;
+  username: string;
+  password?: string; // Optional for display, required for auth
+  name: string;
+  role: "admin" | "user";
+  email?: string;
+}
+
 export interface Student {
   id: UUID;
   studentId: string; // optional external id
