@@ -1,226 +1,252 @@
 # Coaching Tutorial Management System 🎓
 
-A comprehensive **Next JS** application designed to streamline the management of coaching institutes. This system provides tools for managing students, tracking payments, monitoring academic progress, and facilitating communication between instructors and students.
-
+A comprehensive **Next.js** application designed to streamline the management of coaching institutes and tuition centers. This system provides tools for managing students, tracking payments, generating invoices, and analyzing financial data - all stored locally in your browser using localStorage.
 
 ## ✨ Features
 
 ### 👨‍🎓 Student Management
-- Student registration and profile management
-- Course enrollment and tracking
-- Attendance monitoring
-- Academic progress tracking
-- Performance analytics and reports
+- Complete student registration and profile management
+- Student enrollment tracking with grade-based organization
+- Student status management (active/inactive)
+- Search and filter students by name, grade, status, and payment status
+- Student detail view with fee assignments and payment history
+- Bulk fee assignment to multiple students
+- CSV export of student data
 
-### 💰 Payment Management
-- Fee collection and payment tracking
-- Multiple payment methods support
-- Payment history and receipts
-- Due date notifications
-- Financial reporting
+### 💰 Fee & Payment Management
+- **Fee Templates**: Create reusable fee templates with categories (tuition, exam, transport, misc)
+- **Fee Frequency Options**: One-time, monthly, term, annual, or custom frequencies
+- **Payment Recording**: Record payments with multiple payment methods (cash, card, bank transfer, check, etc.)
+- **Payment Application**: Apply payments to specific fee lines with automatic balance calculation
+- **Payment History**: Complete payment tracking with date filtering (today, week, month, year)
+- **Outstanding Balance Tracking**: Real-time calculation of outstanding balances per student
+- **Payment Status**: Visual indicators for paid, partial, and unpaid statuses
 
-### 📚 Academic Features
-- Course and batch management
-- Assignment creation and submission
-- Quiz and exam management
-- Grade tracking and report cards
-- Study materials upload
+### 📄 Invoice Generation
+- **Individual Invoices**: Generate invoices for single students in PDF or HTML format
+- **Bulk Invoice Generation**: Generate invoices for multiple students at once
+- **Automatic Invoice Numbering**: Auto-generated invoice numbers with customizable prefix
+- **Professional Invoice Layout**: Includes student details, fee breakdown, payment history, and outstanding balance
+- **Multiple Export Formats**: PDF for printing or HTML for digital distribution
 
-### 👥 User Roles
-- **Admin**: Full system access and management
-- **Instructors**: Course and student management
-- **Students**: Access to courses, assignments, and progress
-- **Parents**: View student progress and payments
+### 📊 Dashboard & Analytics
+- **Key Performance Indicators**: Total students, collections, outstanding amounts, and overdue counts
+- **Financial Metrics**: Collection rate, average fee per student, monthly growth tracking
+- **Interactive Charts**:
+  - Collection trend chart (monthly payment trends)
+  - Fee category breakdown
+  - Collection by grade analysis
+  - Outstanding balances by grade
+- **Recent Activity Feed**: Latest payment transactions
+- **Key Insights**: Payment method distribution, grade distribution, collection efficiency metrics
 
-### 🔧 Additional Features
-- Dashboard with analytics
-- Mobile responsive design
-- Data export functionality
+### 📈 Reports & Data Management
+- **CSV Exports**:
+  - Students report with complete information
+  - Payment transactions (with date range filtering)
+  - Outstanding balances report
+  - Fee templates report
+- **Data Backup & Restore**:
+  - Full backup to JSON format
+  - Restore from backup file
+  - Complete data migration support
+- **Data Statistics**: View data size and record counts
+
+### ⚙️ Settings & Configuration
+- **School/Institute Configuration**: School name, logo upload, academic year settings
+- **Invoice Settings**: Customizable invoice prefix and numbering sequence
+- **Payment Methods**: Customizable list of accepted payment methods
+- **Fee Categories**: Manage fee category options
+- **Frequency Options**: Customize fee frequency options
+- **Grade Options**: Configure available grade levels
+- **Regional Settings**: Currency, date format, language, timezone
+- **User Management**: Create and manage admin and user accounts
+- **Theme Support**: Light/dark theme toggle
+
+### 🔐 Authentication & Security
+- **User Authentication**: Secure login system with role-based access
+- **User Roles**: Admin and user roles with different permission levels
+- **Default Admin Account**: Pre-configured admin user for initial setup
+
+### 📱 User Experience
+- **Responsive Design**: Fully responsive layout for desktop, tablet, and mobile devices
+- **Modern UI**: Built with Shadcn UI components for a polished interface
+- **Dark Mode**: Theme switching support
+- **Real-time Updates**: Live data updates without page refresh
+- **Pagination**: Efficient data pagination for large datasets
+- **Advanced Filtering**: Multiple filter options for all data views
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **React.js** - UI Library
-- **Tailwind CSS** - Styling framework
-- **React Router** - Client-side routing
-- **Axios** - HTTP client
-- **React Query** - Data fetching and caching
-- **React Hook Form with Zod Resolver** - Form management
-- **Chart.js** - Data visualization
-- **Shadcn UI** - Component Library
+### Frontend Framework
+- **Next.js 15** - React framework with App Router
+- **React 18** - UI library
+- **TypeScript** - Type-safe development
 
-<!-- ### Backend
-- **Node.js** - Runtime environment
-- **Express.js** - Web framework
-- **MongoDB** - NoSQL database
-- **Mongoose** - MongoDB ODM
-- **JWT** - Authentication
-- **Bcrypt.js** - Password hashing
-- **Nodemailer** - Email service
-- **Express Validator** - Input validation
-- **Multer** - File upload handling -->
+### Styling & UI
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **Shadcn UI** - High-quality component library built on Radix UI
+- **Lucide React** - Icon library
+- **next-themes** - Theme management
 
-### Development Tools
-- **Vite** - Build tool
-<!-- - **Nodemon** - Development server -->
-<!-- - **ESLint** - Code linting
-- **Prettier** - Code formatting
-- **Concurrently** - Run multiple commands -->
+### Forms & Validation
+- **React Hook Form** - Performant form library
+- **Zod** - Schema validation
+- **@hookform/resolvers** - Form validation integration
+
+### Data Visualization
+- **Recharts** - Composable charting library for React
+
+### Data Storage
+- **localStorage** - Browser-based data persistence (no backend required)
+
+### Utilities
+- **date-fns** - Date manipulation and formatting
+- **class-variance-authority** - Component variant management
+- **cmdk** - Command menu component
+
+### Build & Deployment
+- **Next.js Static Export** - Generates static HTML for easy deployment
+- **Netlify** - Deployment configuration included
 
 ## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:
-- **Node.js** (v16.0.0 or higher)
-- **npm** or **yarn**
-- **Git**
-<!-- - **MongoDB** (v4.4 or higher) -->
+- **Node.js** (v18.0.0 or higher recommended)
+- **npm** or **yarn** package manager
+- **Git** for version control
 
 ## 🚀 Installation & Setup
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/rg4897/coaching-tutorial-management.git
-cd coaching-tutorial-management
+git clone https://github.com/rg4897/Coaching-app-lite.git
+cd Coaching-app-lite
 ```
 
 ### 2. Install Dependencies
-
-<!-- #### Backend Dependencies
-```bash
-cd server
-npm install
-``` -->
-
-#### Frontend Dependencies
-<!-- cd ../client -->
 ```bash
 npm install
 ```
 
-<!-- ### 3. Environment Variables
-
-#### Backend (.env in server folder)
-```env
-# Server Configuration
-NODE_ENV=development
-PORT=5000
-
-# Database
-MONGO_URI=mongodb://localhost:27017/coaching_management
-DB_NAME=coaching_management
-
-```
-
-#### Frontend (.env in client folder)
-```env
-VITE_API_URL=http://localhost:5000/api
-VITE_APP_NAME=Coaching Management System
-``` -->
-
-<!-- ### 4. Database Setup
-
-Make sure MongoDB is running on your system. The application will create the necessary collections automatically. -->
-
-### 3. Start the Application
-
-#### Development Mode (Recommended)
+### 3. Start the Development Server
 ```bash
-# From root directory - runs both frontend and backend
 npm run dev
 ```
 
-<!-- #### Or run separately:
+The application will be available at [http://localhost:3000](http://localhost:3000)
 
-**Backend:**
+### 4. Build for Production
 ```bash
-cd server
-npm start
+npm run build
 ```
 
-**Frontend:**
+This generates a static export in the `out/` directory that can be deployed to any static hosting service.
+
+### 5. Export Static Site
 ```bash
-cd client
-npm run dev
-``` -->
-
-<!-- ### 4. Access the Application
-- Frontend: http://localhost:5173 -->
-<!-- - Backend API: http://localhost:5000 -->
-<!-- - API Documentation: http://localhost:5000/api-docs  -->
-
-<!-- ## 📁 Project Structure
-
+npm run export
 ```
-coaching-tutorial-management/
-├── client/                     # React frontend
-│   ├── public/
-│   ├── src/
-│   │   ├── components/         # Reusable components
-│   │   ├── pages/             # Page components
-│   │   ├── hooks/             # Custom hooks
-│   │   ├── services/          # API services
-│   │   ├── utils/             # Utility functions
-│   │   ├── context/           # React context
-│   │   └── assets/            # Static assets
-│   ├── package.json
-│   └── vite.config.js
-├── server/                     # Node.js backend
-│   ├── controllers/           # Route controllers
-│   ├── models/               # Mongoose models
-│   ├── routes/               # API routes
-│   ├── middleware/           # Custom middleware
-│   ├── utils/                # Utility functions
-│   ├── config/               # Configuration files
-│   └── package.json
-├── README.md
-└── package.json
-``` -->
 
-<!-- ## 🔐 Default Login Credentials
+## 🔐 Default Login Credentials
 
 ### Admin Account
-- **Email:** admin@coaching.com
-- **Password:** admin123
+- **Username:** `admin`
+- **Password:** `admin123`
 
-### Demo Instructor
-- **Email:** instructor@coaching.com
-- **Password:** instructor123
+> **Note:** Please change these credentials after first login! You can manage users in the Settings page.
 
-### Demo Student
-- **Email:** student@coaching.com
-- **Password:** student123
+## 📁 Project Structure
 
-> **Note:** Please change these credentials in production! -->
+```
+Coaching-app-lite/
+├── app/                      # Next.js App Router pages
+│   ├── (auth)/              # Auth layout group
+│   ├── dashboard/           # Dashboard layout
+│   ├── students/            # Student management pages
+│   ├── fees/                # Fee templates page
+│   ├── payments/            # Payment tracking page
+│   ├── invoices/            # Invoice generation page
+│   ├── reports/             # Reports & data management
+│   ├── settings/            # Settings & configuration
+│   └── login/               # Login page
+├── components/              # React components
+│   ├── charts/             # Chart components
+│   ├── dialogs/            # Dialog components
+│   ├── forms/              # Form components
+│   ├── layout/             # Layout components
+│   └── ui/                 # Shadcn UI components
+├── hooks/                   # Custom React hooks
+├── lib/                     # Utility libraries
+├── types/                   # TypeScript type definitions
+├── utils/                   # Helper functions
+│   ├── calculations.ts     # Financial calculations
+│   ├── csv-export.ts       # CSV export utilities
+│   ├── currency.ts         # Currency formatting
+│   ├── date.ts             # Date formatting
+│   ├── invoice-number.ts   # Invoice number generation
+│   ├── pdf-generator.tsx   # PDF/HTML invoice generation
+│   └── uuid.ts             # UUID generation
+├── public/                  # Static assets
+└── out/                     # Static export output (generated)
+```
 
-<!-- ## 📚 API Endpoints
+## 💾 Data Storage
 
-### Authentication
-- `POST /api/auth/login` - User login
-- `POST /api/auth/register` - User registration
-- `GET /api/auth/me` - Get current user
-- `POST /api/auth/logout` - User logout
+This application uses **localStorage** for data persistence, which means:
+- ✅ No backend server required
+- ✅ Data is stored locally in your browser
+- ✅ Works offline after initial load
+- ✅ Easy backup and restore functionality
+- ⚠️ Data is specific to the browser and device
+- ⚠️ Clearing browser data will remove all records
 
-### Students
-- `GET /api/students` - Get all students
-- `GET /api/students/:id` - Get student by ID
-- `POST /api/students` - Create new student
-- `PUT /api/students/:id` - Update student
-- `DELETE /api/students/:id` - Delete student
+### Data Backup
+Always create regular backups using the Backup feature in the Reports page to prevent data loss.
 
-### Payments
-- `GET /api/payments` - Get all payments
-- `POST /api/payments` - Create payment record
-- `GET /api/payments/student/:id` - Get payments by student
+## 🎯 Key Features Explained
 
-### Courses
-- `GET /api/courses` - Get all courses
-- `POST /api/courses` - Create new course
-- `PUT /api/courses/:id` - Update course
-- `DELETE /api/courses/:id` - Delete course -->
+### Fee Management Workflow
+1. **Create Fee Templates**: Define reusable fee structures (e.g., "Monthly Tuition - Grade 10")
+2. **Assign to Students**: Assign fees to individual students or bulk assign to multiple students
+3. **Record Payments**: Enter payments and apply them to specific fee lines
+4. **Track Balances**: System automatically calculates outstanding amounts
+5. **Generate Invoices**: Create professional invoices for students
+
+### Payment Application
+Payments can be applied to:
+- Single fee line (full or partial payment)
+- Multiple fee lines (split payment)
+- System automatically updates fee status (open, partial, paid, overdue)
+
+### Invoice System
+- Automatic invoice number generation (customizable format)
+- Includes all assigned fees, payment history, and outstanding balance
+- Export as PDF for printing or HTML for email/distribution
+
+## 🌐 Deployment
+
+This application is configured for static site generation and can be deployed to:
+
+- **Netlify** (configuration included in `netlify.toml`)
+- **Vercel**
+- **GitHub Pages**
+- Any static hosting service
+
+### Deploy to Netlify
+1. Build the project: `npm run build`
+2. Deploy the `out/` directory to Netlify
+3. Or connect your repository for automatic deployments
 
 ## 🤝 Contributing
 
-- For any contribution refer [CONTRIBUTING.md](CONTRIBUTING.md) 
+For contribution guidelines, please refer to [CONTRIBUTING.md](CONTRIBUTING.md).
+
+When contributing:
+1. Create an issue before starting work
+2. Use the branch naming convention: `feature/CAL-{issue-id}-{description}`
+3. Follow the existing code style and structure
+4. Test your changes thoroughly
 
 ## 📄 License
 
@@ -231,26 +257,27 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you encounter any issues or have questions:
 1. Check the [Issues](https://github.com/rg4897/Coaching-app-lite/issues) page
 2. Create a new issue if your problem isn't already reported
-3. Provide detailed information about the problem
+3. Provide detailed information about the problem, including:
+   - Browser and version
+   - Steps to reproduce
+   - Expected vs. actual behavior
+
+## 🚧 Known Limitations
+
+- Data is stored in browser localStorage (limited to ~5-10MB)
+- No multi-device synchronization
+- No cloud backup (manual backup required)
+- No email notifications
+- Static export means no server-side features
 
 ## 🙏 Acknowledgments
 
-- [React](https://reactjs.org/) - Frontend library
+- [Next.js](https://nextjs.org/) - React framework
+- [React](https://reactjs.org/) - UI library
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework
-<!-- - [Express.js](https://expressjs.com/) - Backend framework
-- [MongoDB](https://www.mongodb.com/) - Database
-- [Node.js](https://nodejs.org/) - Runtime environment -->
-
-<!-- ## 📸 Screenshots
-
-### Dashboard
-![Dashboard](screenshots/dashboard.png)
-
-### Student Management
-![Student Management](screenshots/students.png)
-
-### Payment Tracking
-![Payment Tracking](screenshots/payments.png) -->
+- [Shadcn UI](https://ui.shadcn.com/) - Component library
+- [Recharts](https://recharts.org/) - Charting library
+- [Radix UI](https://www.radix-ui.com/) - Unstyled UI components
 
 ---
 
